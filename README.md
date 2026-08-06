@@ -1,6 +1,6 @@
 # GaussiAnimate
 
-Official repository of the paper **GaussiAnimate: Reconstruct and Rig Animatable Categories with Level of Dynamics**.
+Official repository of the SIGGRAPH Asia 2026 paper **GaussiAnimate: Rig Animatable Categories with Level of Dynamics**.
 
 > 🚧 This repository is currently under construction. The cleaned codebase will be released around the end of July 2026.
 
