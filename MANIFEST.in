@@ -9,9 +9,9 @@ include experiments/reproductions/dressrecon_bob/LICENSE
 recursive-include experiments/multiview_gaussian/diagnostics *.json *.npy *.png
 recursive-include native *.h *.cpp *.txt *.cmake *.in *.py *.toml *.sh LICENSE
 recursive-include scripts *.py *.sh
-recursive-include tests *.py
-recursive-include docs *.md
 recursive-include .github *.yml
+prune tests
+prune docs
 prune experiments/runs
 prune .research
 prune .native

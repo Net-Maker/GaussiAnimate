@@ -44,6 +44,7 @@ dist/
 # Local pre-release code, results, and large visualization assets.
 .research/
 /docs/
+/tests/
 
 # Approved public examples; other generated animations remain local.
 !partmm/examples/partmm_hood.gif

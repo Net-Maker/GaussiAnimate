@@ -368,7 +368,7 @@ reproduction.
 **Release scope:** Table 3 numerical reproduction is deferred. Its configs and
 evaluation code remain available, but this source release does not claim that
 the table has been reproduced. For the direct reconstruction-to-SSDR rendering
-path, see [SSDR followed by PSNR](experiments/README.md#ssdr-followed-by-psnr).
+path, see [Table 2: synthetic novel-view rendering](experiments/README.md#table-2-synthetic-novel-view-rendering).
 
 ### Two config layers
 
@@ -522,7 +522,6 @@ GaussiAnimate/
 │   ├── monocular_gaussian/     RigGS-derived monocular experiments
 │   ├── multiview_gaussian/     D3DGS human experiments
 │   └── reproductions/          frozen evidence from related local codebases
-├── tests/                      core, protocol, resource, and audit tests
 ├── pyproject.toml              package metadata and command-line entry points
 └── THIRD_PARTY_NOTICES.md      upstream code, data, and license boundaries
 ```
@@ -531,53 +530,17 @@ If you are changing the representation, begin with `skelebone/types.py` and
 `skelebone/io.py`. If you are adding a paper method, begin with
 `experiments/methods/protocol.py` and the nearest domain config.
 
-## Testing
-
-Check the dependency-light core without installing a graphics or Torch runtime:
+## Build a Source Release
 
 ```bash
-python -m pip install -e '.[dev]'
-python -m pytest -q \
-  tests/test_skelebone_core.py tests/test_skelebone_extraction.py \
-  tests/test_partmm.py tests/test_partmm_modules.py \
-  tests/test_partmm_fallback.py tests/test_skelebone_examples.py
-```
-
-For the full CPU test suite, install the experiment and visualization extras.
-Install a matched Torch/Torchvision build for your platform first; CI uses
-Torch 2.2.2 and Torchvision 0.17.2 from the PyTorch CPU index.
-
-```bash
-python -m pip install torch==2.2.2 torchvision==0.17.2 \
-  --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -e '.[dev,geometry,visualization,evaluation,research]'
-python -m pip check
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2 python -m pytest tests -q
-```
-
-Keep these dependencies in one environment rather than borrowing another
-environment's `site-packages`. The geometry extra pins `libigl==2.5.1`; newer
-libigl releases use a different winding-number API.
-
-The extraction contract test uses lightweight stand-ins for DemBones and the
-curve executable. It verifies orchestration and artifact schemas; it does not
-claim that every native dependency, dataset, or full GPU experiment ran in CI.
-Native integration tests are opt-in: after building SSDR, set
-`GAUSSIANIMATE_TEST_NATIVE_PYSSDR=1`; with CGAL/Eigen headers installed, set
-`GAUSSIANIMATE_TEST_NATIVE=1` to compile and exercise curve extraction.
-
-### Build a source release
-
-```bash
+python -m pip install build
 python -m build
-python tests/check_wheel.py dist/*.whl
 ```
 
-The source archive includes the native backends, scripts, tests, configs,
+The source archive includes the native backends, scripts, configs,
 licenses, and README previews. The wheel contains the public Python packages
 and their declared resources. Datasets, checkpoints, local environments and
 generated experiment runs are excluded from both Git and release archives.
-Paper-result verification remains separate from installation and code tests.
 
 ## Practical Notes
 

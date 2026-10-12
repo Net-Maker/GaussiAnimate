@@ -283,7 +283,3 @@ Copy the complete `partmm/` directory, including `examples/`. The core runtime
 depends only on Python's standard library and NumPy. Open3D and Pillow are used
 only for the animated preview, Matplotlib only for the static preview, and Dear
 PyGui only for `partmm.gui`.
-
-The repository test suite also copies this directory into a temporary project,
-imports it there, and runs an animation. This guards the standalone boundary
-against accidental imports from the rest of GaussiAnimate.
