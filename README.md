@@ -34,7 +34,7 @@ There are two ways into this repository. Most users only need the first one.
 | Call the library from Python | [Python API](#python-api) |
 | Transfer a new motion | [Animate with PartMM](#animate-with-partmm) |
 | Copy PartMM into another project | [Standalone PartMM guide](partmm/README.md) |
-| Reproduce a paper table or figure | [Paper experiments](#paper-experiments) |
+| Reproduce the paper experiments | [Experiment guide](experiments/README.md) |
 | Find a module or config | [Repository tour](#repository-tour) |
 
 ## Quick Start
@@ -132,10 +132,6 @@ NumPy 2 before loading the pinned pybind11 binding. You can override the
 Python, install prefix, or module directory through the script's documented
 flags. Run `bash scripts/install_geometry.sh --help` for the complete list.
 
-The curve executable uses CGAL's GPL-licensed Surface Mesh Skeletonization
-package and is therefore kept in a clearly separated GPL directory. The MIT
-Python packages call it as an external process and do not link against it.
-
 ### 4. Run the real AMA example
 
 The core example uses all 175 registered frames of AMA `T_samba`, not a
@@ -152,15 +148,6 @@ python -m skelebone.examples.ama outputs/ama_skelebone
 ```
 
 ![AMA T_samba Skelebone animation](skelebone/examples/ama_skelebone.gif)
-
-Our checked run processes 9,971 vertices and 19,938 shared triangles per frame.
-With the current motion-initialized SSDR protocol, the 50-bone request retains
-50 active outer bones, and curve analysis produces a 28-joint inner
-skeleton. The script writes the canonical input,
-portable bundle, BVH, manifest, every intermediate, and the Open3D animation
-above under `outputs/ama_skelebone/`. The three synchronized panels share one
-fixed `Y`-up camera, so surface motion, free-form outer bones, and the inner
-kinematic hierarchy can be compared frame for frame.
 
 ### 5. Extract your own skelebones
 
@@ -345,172 +332,6 @@ python -m pip install -e '.[gui]'
 gaussianimate-edit outputs/my_asset/skelebones.npz --output novel_pose.npz
 ```
 
-## Paper Experiments
-
-We have fixed several implementation bugs since the original experiments, so reproduced results may differ slightly from the values reported in the paper.
-
-The paper code is organized around a rule that is easy to miss:
-
-> A config says how an experiment should run. It is not evidence that the
-> experiment has already reproduced the paper.
-
-Every table, ablation, and runtime target has a declarative YAML config. The
-catalog separately records whether its current evidence is verified, partial,
-in progress, or blocked.
-
-Run the audit before spending GPU time:
-
-```bash
-gaussianimate-paper-audit
-gaussianimate-paper-audit --require-ready  # full-paper gate, not the source-release gate
-```
-
-The current catalog contains ten paper targets: one is verified, six are
-partial, one is in progress, and two are blocked. Table 5 is the first target
-that meets the repository's strict definition of a fully verified paper
-reproduction.
-
-**Release scope:** Table 3 numerical reproduction is deferred. Its configs and
-evaluation code remain available, but this source release does not claim that
-the table has been reproduced. For the direct reconstruction-to-SSDR rendering
-path, see [Table 2: synthetic novel-view rendering](experiments/README.md#table-2-synthetic-novel-view-rendering).
-
-### Two config layers
-
-The short `config.yaml` in each domain is a reusable registered-sequence preset.
-Run it with `gaussianimate-experiment` when adapting the pipeline to your own
-data. The table- and figure-specific schema expands datasets, cases, methods,
-and stages into paper jobs and is run with `gaussianimate-paper`.
-
-```bash
-gaussianimate-experiment experiments/mesh/config.yaml --validate-only
-gaussianimate-paper experiments/mesh/vto_animation.yaml --validate-only
-```
-
-### The three experiment tracks
-
-#### Mesh
-
-The mesh track asks whether PartMM can generalize garment and animal motion in
-a low-data regime. Begin with `mesh/vto_animation.yaml` for VTO garments or
-`mesh/dt4d_animation.yaml` for DeformingThings4D animals. Recovered and
-recomputed results exist for both, but protocol and reported-number
-discrepancies keep the paper targets partial.
-
-#### Monocular Gaussian
-
-This track studies unseen-view reconstruction and motion-aware skeleton
-extraction from a monocular dynamic Gaussian model. Its main entry points are
-`monocular_gaussian/novel_view.yaml`, `arap_ssdr_ablation.yaml`, and
-`progressive_skeleton.yaml`. Missing renders and checkpoints block the first
-two targets; all five progressive runs finish, but their topology does not yet
-match the paper figure.
-
-#### Multiview Gaussian
-
-The multiview track starts from D3DGS and compares robust LBS, BoB, and PartMM
-on held-out human poses. Use `multiview_gaussian/reconstruction.yaml` for the
-shared reconstruction stage and `multiview_gaussian/novel_pose.yaml` for the
-80/20 motion split. Current artifacts cover all 18 cases for D3DGS, robust
-LBS, training-only SSDR, and paper-spec PartMM. The fresh PartMM runs are
-complete but do not reproduce the paper's printed rendering row.
-
-##### D3DGS: Known Trajectory Artifacts
-
-The stored Actor01Seq2 D3DGS checkpoint contains Gaussian centers that start
-near the body but drift into distant clusters in later frames, before SSDR,
-BoB, or PartMM is applied. A first-frame template envelope does not catch
-these trajectories: our 1.1x outward-envelope trial removed 461 skirt-edge
-points but retained the distant clusters we inspected. Rendering PSNR alone
-did not reveal this failure to clean the point trajectories.
-
-This remains an unresolved issue in that reconstruction input, not a verified
-artifact-removal step in the experiment pipeline.
-
-### Important BoB status
-
-Twelve older BoB result sets and their held-out rendering metrics are retained,
-but they use the previous 66-dimensional pose contract. The current adapter
-requires the v2 contract: 69 pose dimensions, SMPL joints 1 through 23, and 23
-rootless links. **Zero of the old BoB runs pass the current validator.** The
-fresh 18-case v2 recomputation is complete: the released sigmoid-RGB Table 3
-rerun summary records all 18 BoB cases (8 DNA-Rendering, 10 ActorsHQ) complete
-with the current adapter.
-
-Historical aggregates remain useful evidence, but they are not presented as
-current trained models.
-
-### Inspect a config before running it
-
-These commands do not load a dataset or start training:
-
-```bash
-gaussianimate-paper experiments/mesh/vto_animation.yaml --validate-only
-gaussianimate-paper experiments/mesh/vto_animation.yaml --list
-gaussianimate-paper experiments/mesh/vto_animation.yaml --dry-run
-```
-
-Then select one dataset, case, and method:
-
-```bash
-# Mesh
-gaussianimate-paper experiments/mesh/vto_animation.yaml \
-  --dataset vto --case tshirt --method partmm --gpus 0
-
-# Monocular Gaussian
-gaussianimate-paper experiments/monocular_gaussian/novel_view.yaml \
-  --dataset dnerf --case hook --method ours --gpus 0
-
-# Multiview Gaussian
-gaussianimate-multiview-pipeline status --full
-gaussianimate-paper experiments/multiview_gaussian/novel_pose.yaml \
-  --dataset dna_rendering --case dna_0012_11 --method smpl_partmm --gpus 0
-```
-
-Paper runs are config-driven and resumable. Each expanded job records its
-configuration fingerprint, stage logs, `job.json`, method artifacts, and
-metrics. Complete experiment roots aggregate `results.csv`, `averages.csv`,
-`summary.json`, and `summary.md`. Use `--force` only when you intend to replace
-a completed stage.
-
-Execution modes are explicit:
-
-- `native`: implemented by this repository's public packages.
-- `external`: calls a recorded historical or upstream research workspace.
-- `artifact`: evaluates an existing result without claiming it was trained
-  here.
-- `blocked`: declared for completeness, but refused because the available path
-  would violate the intended protocol.
-
-See [experiments/README.md](experiments/README.md) for datasets, resource
-contracts, stage selection, GPU scheduling, output schemas, known protocol
-discrepancies, and the complete blocker list.
-
-## Experiment Resources
-
-Large datasets, checkpoints, and independently licensed rasterizers are not
-installed by `pip`. Resource manifests describe exactly what each adapter
-expects:
-
-```text
-experiments/monocular_gaussian/resources.yaml
-experiments/multiview_gaussian/resources.yaml
-experiments/multiview_gaussian/pipeline.yaml
-```
-
-Useful preflight commands:
-
-```bash
-gaussianimate-monocular-resources --content-hash
-
-gaussianimate-multiview-resources --full \
-  --require-raw --require-runtime
-```
-
-The multiview release validator checks file readability, shapes, contiguous
-80/20 splits, point coverage, provenance, and current method contracts rather
-than treating a non-empty directory as success.
-
 ## Repository Tour
 
 ```text
@@ -530,8 +351,7 @@ GaussiAnimate/
 ```
 
 If you are changing the representation, begin with `skelebone/types.py` and
-`skelebone/io.py`. If you are adding a paper method, begin with
-`experiments/methods/protocol.py` and the nearest domain config.
+`skelebone/io.py`.
 
 ## Build a Source Release
 
@@ -544,22 +364,6 @@ The source archive includes the native backends, scripts, configs,
 licenses, and README previews. The wheel contains the public Python packages
 and their declared resources. Datasets, checkpoints, local environments and
 generated experiment runs are excluded from both Git and release archives.
-
-## Practical Notes
-
-**My input validates, but extraction fails.**  First confirm that point indices
-are temporally registered. Then check `pyssdr`, the curve executable, surface
-watertightness, and the scale-dependent thresholds in that order.
-
-**Why does an experiment say `external` or `artifact`?**  Some baselines and
-historical reconstruction stages retain their own repositories or licenses.
-The mode makes that boundary visible instead of silently presenting an adopted
-file as a local training run.
-
-**Why are paper configs included when the audit is not green?**  Missing and
-contradictory evidence is part of reproducibility work. Keeping the intended
-protocol executable lets contributors close one gap at a time without hiding
-what remains unresolved.
 
 ## Citation
 
