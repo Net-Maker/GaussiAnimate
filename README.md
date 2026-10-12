@@ -2,7 +2,7 @@
 
 ![GaussiAnimate project teaser](assets/teaser.jpg)
 
-**Reconstruct and Rig Animatable Categories with Level of Dynamics**
+Official repository of the SIGGRAPH Asia 2026 paper **GaussiAnimate: Rig Animatable Categories with Level of Dynamics**.
 
 [![Project Page](https://img.shields.io/badge/Project-Page-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://cookmaker.cn/gaussianimate)
 [![Paper](https://img.shields.io/badge/arXiv-2604.08547-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2604.08547)
