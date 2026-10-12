@@ -1,0 +1,39 @@
+schema_version: 1
+ranges: inclusive
+split_scope: SSDR fitting and motion-transfer evaluation; not a held-out split for D3DGS reconstruction
+case_sources: resources.yaml
+dna_rendering:
+  captures: ["0012_11", "0013_01", "0013_03", "0013_09", "0013_11", "0019_08", "0021_03", "0023_06"]
+  prepared_frames: [0, 149]
+  fitting_frames: [0, 119]
+  test_frames: [120, 149]
+  cameras: [0, 47]
+  evaluation_cameras: [0, 12, 24, 36]
+  image_scale: 1.0
+  raw_frames_for_new_conversion: [0, 149]
+  raw_frame_step: 1
+  historical_raw_mapping: not_independently_verified
+  pose_source: official annotation SMC, get_SMPLx(Frame_id=frame)
+actorshq:
+  prepared_frames: [0, 299]
+  fitting_frames: [0, 239]
+  test_frames: [240, 299]
+  resolution: 4x
+  crop: square_center_crop
+  cameras: [Cam001, Cam160]
+  evaluation_cameras: [Cam001, Cam041, Cam081, Cam121]
+  raw_frame_rule: raw_frame = case_start_frame + prepared_frame_index
+  pose_source: fitted SMPL-X JSONs, indexed by raw frame
+  pose_public_availability: unverified
+  pose_generation: not_packaged
+  captures:
+    - {case: actorshq_actor01_seq1, raw: Actor01/Sequence1, fitting: [822, 1061], test: [1062, 1121]}
+    - {case: actorshq_actor01_seq2, raw: Actor01/Sequence2, fitting: [758, 997], test: [998, 1057]}
+    - {case: actorshq_actor02_seq1, raw: Actor02/Sequence1, fitting: [743, 982], test: [983, 1042]}
+    - {case: actorshq_actor02_seq2, raw: Actor02/Sequence2, fitting: [1013, 1252], test: [1253, 1312]}
+    - {case: actorshq_actor04_seq2, raw: Actor04/Sequence2, fitting: [717, 956], test: [957, 1016]}
+    - {case: actorshq_actor05_seq1, raw: Actor05/Sequence1, fitting: [870, 1109], test: [1110, 1169]}
+    - {case: actorshq_actor06_seq1, raw: Actor06/Sequence1, fitting: [916, 1155], test: [1156, 1215]}
+    - {case: actorshq_actor06_seq2, raw: Actor06/Sequence2, fitting: [206, 445], test: [446, 505]}
+    - {case: actorshq_actor07_seq1, raw: Actor07/Sequence1, fitting: [966, 1205], test: [1206, 1265]}
+    - {case: actorshq_actor08_seq1, raw: Actor08/Sequence1, fitting: [858, 1097], test: [1098, 1157]}

@@ -29,7 +29,7 @@ def evaluate_partmm(
 ):
     configure_visible_gpu(gpu)
     sys.path.insert(0, str(Path(d3dgs_root).resolve()))
-    from eval_lbs_metrics import (  # pylint: disable=import-error,import-outside-toplevel
+    from experiments.backends.d3dgs.eval_lbs_metrics import (
         compute_fg_psnr,
         compute_lpips,
         compute_psnr,

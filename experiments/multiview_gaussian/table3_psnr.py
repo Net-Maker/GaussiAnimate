@@ -112,7 +112,10 @@ def evaluation_signature(case, root, d3dgs_root, data_dir, num_cameras, method):
         prediction / 'warped_sequence.npy', prediction / 'point_indices.npy',
         prediction / 'metadata.json',
     ])
-    paths.extend([Path(d3dgs_root) / 'eval_lbs_metrics.py', Path(d3dgs_root) / 'helpers.py'])
+    paths.extend([
+        Path(__file__).resolve().parents[1] / 'backends/d3dgs/eval_lbs_metrics.py',
+        Path(d3dgs_root) / 'helpers.py',
+    ])
     paths.append(Path(__file__))
     return {
         'schema_version': 1, 'case': case, 'method': method,
@@ -137,7 +140,7 @@ def evaluate_trainset(case, root, d3dgs_root, data_dir, gpu, num_cameras,
                       method="partmm"):
     configure_visible_gpu(gpu)
     sys.path.insert(0, str(Path(d3dgs_root).resolve()))
-    from eval_lbs_metrics import (  # pylint: disable=import-error,import-outside-toplevel
+    from experiments.backends.d3dgs.eval_lbs_metrics import (
         compute_psnr, load_gt_image, load_seg_mask, render_gaussians,
         select_evenly_spaced_cameras,
     )

@@ -83,6 +83,9 @@ methods:
         cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
         env:
           PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+        # The historical variant imports the packaged runtime
+        # experiments.backends.partmm_research; no external implementation
+        # checkout is required.
         command:
           - ${GA_PARTMM_PYTHON:-~/anaconda3/envs/hood/bin/python}
           - -m
@@ -101,10 +104,6 @@ methods:
           - "{run_dir}/motion/smpl_motion.npz"
           - --output-dir
           - "{run_dir}/partmm/{case.id}"
-          - --implementation-root
-          - ${GA_PARTMM_ROOT:-~/research/GA/In2You}
-          - --motion2motion-root
-          - ${GA_MOTION2MOTION_ROOT:-~/research/GA/Cloth3D/Motion2Motion_codes}
           - --smpl-model-dir
           - ${GA_SMPL_MODEL_DIR:-~/research/GA/Cloth3D/smpl2bvh/data/smpl/smpl}
           - --train-ratio

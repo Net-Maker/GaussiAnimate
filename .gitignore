@@ -19,6 +19,10 @@ outputs/
 saved_final_results/
 experiments/runs/
 checkpoints/
+# Local resource bundles prepared for separate distribution.
+/resources/partmm/example/
+/resources/partmm/ssdr/
+/resources/partmm/reference/
 screenshot/
 wandb/
 *.pth

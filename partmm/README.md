@@ -32,8 +32,26 @@ tshirt_shape00_01_01   tshirt_shape00_02_04   tshirt_shape00_02_05
 tshirt_shape00_05_20   tshirt_shape00_07_02
 ```
 
-Point the example to licensed local copies of HOOD's saved SSDR results and the
+The small [resource bundle](../resources/partmm/README.md) contains ready-to-use
+NumPy inputs for this case. After downloading the bundle (sharing link pending),
+run the standalone animation without a HOOD checkout or SMPL model files:
+
+```bash
+python -m partmm resources/partmm/example/partmm_input.npz \
+  resources/partmm/example/partmm_query.npz outputs/partmm_tshirt.npz \
+  --partition-mode humanoid_five
+```
+
+To rebuild the visualized example from the original simulation exports,
+point the example to licensed local copies of HOOD's saved SSDR results and the
 VTO simulations. These datasets are intentionally not copied into this folder.
+Download the simulations from the [VTO dataset](https://github.com/isantesteban/vto-dataset);
+the [HOOD repository](https://github.com/Dolorousrtur/HOOD) provides the upstream
+cloth-model code. The quickstart's saved SSDR and reference NPZ caches are not
+part of that upstream data: they are author-generated, not yet published for
+download, and cloning HOOD alone does not supply them. See the
+[resource inventory](../experiments/README.md#resources) for acquisition details
+and the remaining release dependencies.
 
 ```bash
 python -m pip install "numpy<1.26" "open3d>=0.19,<0.20" Pillow

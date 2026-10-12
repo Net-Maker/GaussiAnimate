@@ -46,7 +46,7 @@ def contact_sheet(rows, records, case, camera_id, output):
 
 def run(args):
     sys.path.insert(0, str(args.d3dgs_root))
-    from eval_lbs_metrics import (compute_psnr, compute_fg_psnr, load_gt_image,
+    from experiments.backends.d3dgs.eval_lbs_metrics import (compute_psnr, compute_fg_psnr, load_gt_image,
                                   load_seg_mask, render_gaussians, select_evenly_spaced_cameras)
     from helpers import setup_camera
     import torch

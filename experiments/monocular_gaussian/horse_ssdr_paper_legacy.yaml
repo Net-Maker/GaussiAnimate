@@ -1,7 +1,6 @@
 # Recovered June 2025 Horse SSDR fitting protocol. Use this config with the
 # matching 24,615-point trajectory cache; it is not interchangeable with the
 # later 80k reconstruction cache used by horse_ssdr.yaml.
-riggs_root: ${GA_RIGGS_ROOT}
 model_path: ${GA_HORSE_PAPER_RECONSTRUCTION}
 iteration: 40000
 num_bones: 30

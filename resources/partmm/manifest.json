@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "download_url": null,
+  "download_status": "pending_author_upload",
+  "example_case": "tshirt_shape00_91_33",
+  "total_bytes": 1084390731,
+  "provenance": "Author-generated HOOD/VTO PartMM inputs, fitted SSDR databases and reference results; copied without transformation.",
+  "license_note": "Original dataset and body-model terms still apply. No body-model files or training checkpoints are included.",
+  "files": [
+    {
+      "path": "resources/partmm/example/partmm_input.npz",
+      "size_bytes": 2350142,
+      "sha256": "33ef1adc9668bc49de490e362998bbda211cf0f96d71565b995ec2e4d97f3d9a"
+    },
+    {
+      "path": "resources/partmm/example/partmm_query.npz",
+      "size_bytes": 143810,
+      "sha256": "f43248a0caac3952ccabeb11358a2df52a22b96b123cbe16e74e345f630a655d"
+    },
+    {
+      "path": "resources/partmm/ssdr/tshirt_n20_bones20.npy",
+      "size_bytes": 236607530,
+      "sha256": "8d050014fbb8b03518a722f26e37e09f69df56906cde7b017e0c6386e85aca35"
+    },
+    {
+      "path": "resources/partmm/ssdr/tshirt_n50_bones20.npy",
+      "size_bytes": 683871357,
+      "sha256": "47a0eb73184d30dab134b5f0f72a81c08c9d442ebfb51373910683abd3ab79a2"
+    },
+    {
+      "path": "resources/partmm/ssdr/tshirt_n5_bones20.npy",
+      "size_bytes": 92204847,
+      "sha256": "97705410145d05d939a46146395efd7ab1f38488f35fb703dc40b218f1b71e79"
+    },
+    {
+      "path": "resources/partmm/ssdr/tshirt_shape00_ALL_bones20.npz",
+      "size_bytes": 19091299,
+      "sha256": "f5e4d5142fc3de46dcc1405aecda4a1bf78d2ac484bea522fb375e5267538170"
+    },
+    {
+      "path": "resources/partmm/reference/partmm_runtime_v2_tshirt_shape00_91_33.json",
+      "size_bytes": 662,
+      "sha256": "44185ee48dbd309624c08f0d7eb16817b595c54bacc8688aef8b64ccd378dbd0"
+    },
+    {
+      "path": "resources/partmm/reference/tshirt_clean_results.json",
+      "size_bytes": 1137,
+      "sha256": "22b5fcc4597f352fc9c03718dea3a2f87da6b547080584eedd7596673b182052"
+    },
+    {
+      "path": "resources/partmm/reference/tshirt_shape00_91_33.npz",
+      "size_bytes": 50119947,
+      "sha256": "5bd45434bee626ee9676b645df3bf6f1997cba13e65b115eb87edb86c3d6da1c"
+    }
+  ]
+}

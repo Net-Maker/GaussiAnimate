@@ -1,9 +1,15 @@
 # Third-Party Notices
 
-The root MIT license covers the original public implementation distributed in
-the `skelebone`, `partmm`, and `experiments` Python packages. It does not
-relicense external tools, datasets, pretrained models, or the local legacy
-research snapshot. Each of those remains subject to its own terms.
+The root MIT license covers the original public implementation in `skelebone`,
+`partmm`, and the original experiment adapters. It does not relicense copied
+third-party implementations under `experiments/backends`, external tools,
+datasets, pretrained models, or legacy research code. Copied implementations
+retain their own notices and terms; see the notices beside each backend.
+
+The local `partmm_research` backend includes Motion2Motion files whose
+redistribution permission has not been established. Their presence in this
+working tree is not an open-source license grant. Resolve that permission or
+replace those files before publishing a release containing the backend.
 
 ## Native runtime tools
 
@@ -72,6 +78,19 @@ The BoB rendering evaluator requires the Dynamic3DGaussians Gaussian rasterizer.
 That rasterizer is not copied here and retains the Inria/MPII research-only
 Gaussian-Splatting License.
 
+## Bundled monocular backend
+
+`experiments/backends/monocular` bundles monocular Gaussian reconstruction
+code derived from [RigGS](https://github.com/yaoyx689/RigGS) and distributed under GPL-3.0; the full upstream
+license text is preserved in `experiments/backends/monocular/LICENSE`. Code
+inherited from [SC-GS](https://github.com/CVMI-Lab/SC-GS) remains under its MIT License (Copyright (c) 2024
+Yihua Huang), preserved in `experiments/backends/monocular/LICENSE.SC-GS`.
+Components derived from the Inria/MPII gaussian-splatting implementation
+remain under the research-only Gaussian-Splatting License, preserved in
+`experiments/backends/monocular/LICENSE.md`; that license permits research
+and evaluation use only, without right to sublicense, and commercial use
+requires prior explicit consent from Inria.
+
 ## Excluded legacy snapshot
 
 The working research tree may contain upstream or adapted code that is
@@ -85,6 +104,8 @@ explicitly excluded from the public wheel and ignored by the release manifest:
 - RigGS-derived and Dynamic3DGaussians-derived reconstruction code retains the
   notices and licenses supplied by those upstream projects.
 
-Do not distribute those excluded files under the root MIT license. The public
-experiment adapters consume their exported point trajectories through documented
-file interfaces instead of bundling their implementations.
+Do not distribute those excluded files under the root MIT license. Focused
+backend bundles under `experiments/backends/` are retained with the preserved
+license files and notices above; beyond those bundles, the public experiment
+adapters consume their exported point trajectories through documented file
+interfaces instead of bundling excluded legacy snapshot implementations.

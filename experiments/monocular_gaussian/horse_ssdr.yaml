@@ -1,5 +1,5 @@
-riggs_root: ${GA_RIGGS_ROOT}
 model_path: ${GA_HORSE_RECONSTRUCTION}
+source_path: ${GA_HORSE_DATA}
 iteration: 39000
 num_bones: 50
 rest_frame: 0

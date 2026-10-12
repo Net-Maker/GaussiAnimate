@@ -139,7 +139,12 @@ Python packages call it as an external process and do not link against it.
 ### 4. Run the real AMA example
 
 The core example uses all 175 registered frames of AMA `T_samba`, not a
-generated fixture or a cached skeleton. Point the runner at your local copy:
+generated fixture or a cached skeleton. The meshes come from the official
+[AMA project page](https://people.csail.mit.edu/drdaniel/mesh_animation/); the
+[T_samba meshes archive](https://groups.csail.mit.edu/graphics/mesh_animation/T_samba/meshes.tgz)
+is about 39.5 MB. After extraction, arrange the files as
+`GA_AMA_ROOT/T_samba/meshes/mesh_*.obj`. Point the runner at your local
+copy:
 
 ```bash
 export GA_AMA_ROOT=/path/to/AMA
@@ -419,8 +424,6 @@ these trajectories: our 1.1x outward-envelope trial removed 461 skirt-edge
 points but retained the distant clusters we inspected. Rendering PSNR alone
 did not reveal this failure to clean the point trajectories.
 
-See the [saved artifact analysis](experiments/multiview_gaussian/diagnostics/actor01_artifacts/README.md)
-for the point-ID comparison, measured distances, and filtering results.
 This remains an unresolved issue in that reconstruction input, not a verified
 artifact-removal step in the experiment pipeline.
 
@@ -519,7 +522,7 @@ GaussiAnimate/
 │   ├── engine/                 config composition, stages, cache, and reports
 │   ├── methods/                shared protocol and artifact contracts
 │   ├── mesh/                   VTO and DeformingThings4D
-│   ├── monocular_gaussian/     RigGS-derived monocular experiments
+│   ├── monocular_gaussian/     monocular Gaussian experiments
 │   ├── multiview_gaussian/     D3DGS human experiments
 │   └── reproductions/          frozen evidence from related local codebases
 ├── pyproject.toml              package metadata and command-line entry points

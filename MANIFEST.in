@@ -4,9 +4,10 @@ recursive-include assets *.jpg
 recursive-include skelebone *.py *.png *.gif
 recursive-include partmm *.py *.md *.png *.gif
 recursive-include experiments *.py *.yaml *.md
+recursive-include experiments/backends LICENSE* NOTICE* requirements*.txt
+recursive-include resources/partmm *.md *.json
 recursive-include experiments/reproductions/results *.json
 include experiments/reproductions/dressrecon_bob/LICENSE
-recursive-include experiments/multiview_gaussian/diagnostics *.json *.npy *.png
 recursive-include native *.h *.cpp *.txt *.cmake *.in *.py *.toml *.sh LICENSE
 recursive-include scripts *.py *.sh
 recursive-include .github *.yml
@@ -16,6 +17,9 @@ prune experiments/runs
 prune .research
 prune .native
 prune outputs
+prune resources/partmm/example
+prune resources/partmm/ssdr
+prune resources/partmm/reference
 prune build
 prune dist
 prune native/pyssdr/build

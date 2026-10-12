@@ -43,10 +43,13 @@ def load_config(path: Path) -> Dict[str, Any]:
         config = yaml.safe_load(handle)
     if not isinstance(config, dict):
         raise ValueError(f"configuration must be a mapping: {path}")
-    required = {"riggs_root", "model_path", "iteration", "num_bones", "output_dir"}
+    required = {"model_path", "iteration", "num_bones", "output_dir"}
     missing = sorted(required - set(config))
     if missing:
         raise ValueError(f"configuration is missing: {', '.join(missing)}")
+    from .riggs_loader import bundled_engine_root
+
+    config.setdefault("riggs_root", os.environ.get("GA_RIGGS_ROOT") or str(bundled_engine_root()))
     return _expand(config)
 
 
@@ -166,13 +169,22 @@ def _activate_riggs(riggs_root: Path) -> None:
     sys.path.insert(0, root)
 
 
-def _load_models(riggs_root: Path, model_path: Path, iteration: int):
+def _load_models(
+    riggs_root: Path,
+    model_path: Path,
+    iteration: int,
+    *,
+    source_path: Optional[Path] = None,
+):
     _activate_riggs(riggs_root)
-    from model_loader import load_base_models
+    from .riggs_loader import load_base_models
 
     dataset = _parse_saved_namespace(model_path / "cfg_args")
     dataset.model_path = str(model_path.resolve())
-    dataset.source_path = str(Path(dataset.source_path).expanduser().resolve())
+    dataset.source_path = str(
+        Path(source_path if source_path is not None else dataset.source_path)
+        .expanduser().resolve()
+    )
     models = load_base_models(dataset, iteration=iteration, shuffle=False)
 
     # Older RigGS loaders omit this constructor argument. The PLY remains valid,
@@ -499,7 +511,10 @@ def evaluate(
         )
         return ssdr_path
 
-    _, models = _load_models(riggs_root, model_path, iteration)
+    _, models = _load_models(
+        riggs_root, model_path, iteration,
+        source_path=config.get("source_path"),
+    )
     trajectory_shape = None
     if stage in {"all", "ssdr", "extract"}:
         trajectory, frame_fids = extract_trajectory(models)

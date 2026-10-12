@@ -11,6 +11,8 @@ import torch
 import torch.nn.functional as functional
 from torchvision.transforms.functional import to_tensor
 
+from .riggs_loader import bundled_engine_root
+
 
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tif", ".tiff"}
 
@@ -77,7 +79,7 @@ def evaluate(
     output: Path,
     metrics,
     device: str,
-    riggs_root: Path,
+    riggs_root: Path = None,
 ):
     requested = tuple(metrics)
     unknown = set(requested) - {"psnr", "ssim", "lpips"}
@@ -92,7 +94,7 @@ def evaluate(
 
     lpips_model = None
     if "lpips" in requested:
-        sys.path.insert(0, str(Path(riggs_root).resolve()))
+        sys.path.insert(0, str(Path(riggs_root or bundled_engine_root()).resolve()))
         from lpipsPyTorch.modules.lpips import LPIPS
 
         lpips_model = LPIPS("vgg", "0.1").to(device).eval()
@@ -153,7 +155,7 @@ def main():
     parser.add_argument(
         "--riggs-root",
         type=Path,
-        default=Path("~/research/GA/RigGS").expanduser(),
+        default=bundled_engine_root(),
     )
     args = parser.parse_args()
     result = evaluate(

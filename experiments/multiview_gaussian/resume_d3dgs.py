@@ -1,7 +1,6 @@
 """Memory-safe launcher for the historical Dynamic3DGaussians trainer."""
 
 import argparse
-import importlib.util
 import os
 import sys
 from pathlib import Path
@@ -149,17 +148,9 @@ def load_output_history_once(path: Path) -> List[Dict[str, np.ndarray]]:
 
 
 def _load_trainer(root: Path) -> ModuleType:
-    script = root / "train_dna.py"
-    if not script.is_file():
-        raise FileNotFoundError(script)
     sys.path.insert(0, str(root))
-    spec = importlib.util.spec_from_file_location(
-        "_gaussianimate_external_train_dna", script
-    )
-    if spec is None or spec.loader is None:
-        raise ImportError(f"cannot load D3DGS trainer: {script}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from experiments.backends.d3dgs import train_dna as module
+
     return module
 
 

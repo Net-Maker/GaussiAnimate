@@ -72,10 +72,11 @@ def adopt_checkpoint(
     adapter_files = (
         Path(__file__).resolve(),
         Path(__file__).with_name("resume_d3dgs.py").resolve(),
+        adapter_root / "experiments/backends/d3dgs/train_dna.py",
     )
     source_files = tuple(
         d3dgs_root / name
-        for name in ("train_dna.py", "helpers.py", "external.py")
+        for name in ("helpers.py", "external.py")
     )
     missing_source_files = [path for path in source_files if not path.is_file()]
     if missing_source_files:

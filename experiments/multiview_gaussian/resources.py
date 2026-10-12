@@ -338,13 +338,18 @@ def _runtime(config: Dict[str, Any]) -> Dict[str, Any]:
         "scripts": {},
         "imports": {},
     }
-    for script in (
-        "train_dna.py",
-        "lbs_drive_gaussians.py",
-        "batch_fit_bob.py",
-        "eval_ssdr_metrics.py",
-    ):
+    for script in ("helpers.py", "external.py"):
         records["scripts"][script] = _file(Path(roots["d3dgs"]) / script)
+
+    experiments_root = Path(__file__).resolve().parents[1]
+    for script in (
+        "backends/d3dgs/train_dna.py",
+        "backends/d3dgs/eval_lbs_metrics.py",
+        "multiview_gaussian/human_lbs.py",
+        "multiview_gaussian/human_bob.py",
+        "reproductions/dressrecon_bob/fit_bob.py",
+    ):
+        records["scripts"][script] = _file(experiments_root / script)
 
     environment = os.environ.copy()
     pythonpath = [roots["dressrecon"]]

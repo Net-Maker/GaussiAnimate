@@ -33,12 +33,14 @@ methods:
       - id: train
         type: command
         resources: {gpu: true}
-        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
-          - train_gui.py
+          - ${GA_MONOCULAR_PYTHON:-python}
+          - -m
+          - experiments.backends.monocular
+          - train
           - --source_path
-          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - "${GA_SYNTHETIC_DATA_ROOT}/{case.id}"
           - --model_path
           - "{run_dir}/model"
           - --deform_type
@@ -57,18 +59,20 @@ methods:
           - 10000
           - --use_isotropic_gs
         inputs:
-          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - "${GA_SYNTHETIC_DATA_ROOT}/{case.id}"
         outputs:
           - "{run_dir}/model_node/cfg_args"
       - id: render
         type: command
         resources: {gpu: true}
-        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
-          - render.py
+          - ${GA_MONOCULAR_PYTHON:-python}
+          - -m
+          - experiments.backends.monocular
+          - render
           - --source_path
-          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - "${GA_SYNTHETIC_DATA_ROOT}/{case.id}"
           - --model_path
           - "{run_dir}/model"
           - --deform_type

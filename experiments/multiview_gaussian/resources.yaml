@@ -23,7 +23,7 @@ runtime:
   imports:
     reconstruction: [torch, diff_gaussian_rasterization]
     lbs: [igl, chumpy]
-    bob: [lab4d.nnutils.fit_bob]
+    bob: [lab4d.nnutils.skinning, lab4d.utils.geom_utils]
     evaluation: [lpips, skimage]
 derived_protocols:
   bob:

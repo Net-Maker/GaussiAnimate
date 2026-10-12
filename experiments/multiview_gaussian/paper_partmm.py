@@ -3,7 +3,6 @@
 import argparse
 import hashlib
 import json
-import sys
 from dataclasses import fields, replace
 from pathlib import Path
 from typing import Any, Dict
@@ -37,7 +36,7 @@ _PAPER_SPEC_PARTMM_CONFIG = PartMMConfig(
 
 def _source_hash(root: Path) -> str:
     digest = hashlib.sha256()
-    for path in sorted((root / "smpl_to_ssdr").rglob("*.py")):
+    for path in sorted(root.rglob("*.py")):
         digest.update(str(path.relative_to(root)).encode("utf-8"))
         digest.update(path.read_bytes())
     return digest.hexdigest()
@@ -70,21 +69,23 @@ def run_paper_partmm(
     motion_path: Path,
     output_dir: Path,
     *,
-    implementation_root: Path,
-    motion2motion_root: Path,
     smpl_model_dir: Path,
     train_ratio: float = 0.8,
     device: str = "cpu",
 ) -> dict:
-    sys.path.insert(0, str(Path(motion2motion_root).resolve()))
-    sys.path.insert(0, str(Path(implementation_root).resolve()))
     import torch
-    from smpl_to_ssdr.core import SMPLMotionData, SSDRMotionData
-    from smpl_to_ssdr.core.part_matcher import PartBasedSMPLToSSDRMatcher
-    from smpl_to_ssdr.reconstruction import (
+    from experiments.backends import partmm_research
+    from experiments.backends.partmm_research import (
+        PartBasedSMPLToSSDRMatcher,
+        SMPLMotionData,
+        SSDRMotionData,
         reconstruct_vertices,
         result_to_lbs_transforms,
+        set_smpl_model_dir,
     )
+    # The vendored PartMM runtime loads its licensed SMPL model data from the
+    # directory configured here; no ambient environment variable is involved.
+    set_smpl_model_dir(smpl_model_dir)
 
     with np.load(params_path, allow_pickle=False) as params:
         ground_truth = np.asarray(params["means3D"], dtype=np.float32)
@@ -210,8 +211,10 @@ def run_paper_partmm(
         ),
         "ssdr_fitted_frames": fitted,
         "implementation": {
-            "root": str(Path(implementation_root).resolve()),
-            "python_source_sha256": _source_hash(Path(implementation_root)),
+            "module": "experiments.backends.partmm_research",
+            "python_source_sha256": _source_hash(
+                Path(partmm_research.__file__).parent
+            ),
             "revision": "uncommitted_local_research_snapshot",
         },
         "partmm": {
@@ -309,22 +312,15 @@ def main() -> None:
     parser.add_argument("--ssdr-cache", type=Path, required=True)
     parser.add_argument("--motion", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--implementation-root", type=Path)
-    parser.add_argument("--motion2motion-root", type=Path)
     parser.add_argument("--smpl-model-dir", type=Path)
     parser.add_argument("--train-ratio", type=float, default=0.8)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--experiment-config", type=Path)
     parser.add_argument("--method-id")
     args = parser.parse_args()
-    if args.variant == "historical" and None in (
-        args.implementation_root,
-        args.motion2motion_root,
-        args.smpl_model_dir,
-    ):
+    if args.variant == "historical" and args.smpl_model_dir is None:
         parser.error(
-            "--implementation-root, --motion2motion-root, and "
-            "--smpl-model-dir are required for the historical variant"
+            "--smpl-model-dir is required for the historical variant"
         )
     if args.method_id and args.experiment_config is None:
         parser.error("--method-id requires --experiment-config")
@@ -376,8 +372,6 @@ def main() -> None:
             args.ssdr_cache,
             args.motion,
             args.output_dir,
-            implementation_root=args.implementation_root,
-            motion2motion_root=args.motion2motion_root,
             smpl_model_dir=args.smpl_model_dir,
             train_ratio=train_ratio,
             device=args.device,

@@ -46,6 +46,28 @@ research = [
   "h5py>=3.8,<4",
   "trimesh>=3.23,<5",
   "tensorboard>=2.12,<3",
+  "tqdm>=4.60,<5",
+  "unfoldNd>=0.2,<1",
+  "scipy>=1.8,<1.16",
+  "opencv-python-headless>=4.6,<4.12",
+]
+monocular = [
+  "torch>=2.0,<2.6",
+  "torchvision>=0.15,<0.21",
+  "Pillow>=9.5",
+  "plyfile>=1.0",
+  "scipy>=1.8,<1.16",
+  "imageio",
+  "imageio-ffmpeg",
+  "matplotlib>=3.7",
+  "piq",
+  "pytorch-msssim",
+  "dearpygui>=2.0,<3",
+  "lpips>=0.1.4",
+  "openmesh",
+  "tqdm>=4.60,<5",
+  "tensorboard>=2.12,<3",
+  "opencv-python-headless>=4.6,<4.12",
 ]
 dev = ["pytest>=7,<9", "build>=1,<2"]
 
@@ -70,21 +92,12 @@ gaussianimate-multiview-evidence = "experiments.multiview_gaussian.historical_ev
 [tool.setuptools]
 include-package-data = false
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
-packages = [
-  "partmm",
-  "partmm.examples",
-  "skelebone",
-  "skelebone.examples",
-  "skelebone.extraction",
-  "experiments",
-  "experiments.engine",
-  "experiments.methods",
-  "experiments.monocular_gaussian",
-  "experiments.multiview_gaussian",
-  "experiments.mesh",
-  "experiments.reproductions",
-  "experiments.reproductions.dressrecon_bob",
-]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["partmm*", "skelebone*", "experiments*"]
+exclude = ["experiments.runs*"]
+namespaces = false
 
 [tool.setuptools.package-data]
 partmm = ["README.md", "examples/*.png", "examples/*.gif"]
@@ -102,6 +115,7 @@ experiments = [
   "reproductions/results/*.json",
   "reproductions/dressrecon_bob/LICENSE",
 ]
+"experiments.backends" = ["**/LICENSE*", "**/NOTICE*", "**/THIRD_PARTY_NOTICES.md", "**/requirements*.txt"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
