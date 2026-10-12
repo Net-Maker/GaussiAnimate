@@ -39,19 +39,6 @@ all outputs exist. Averages are written only for complete case coverage.
 | `progressive_skeletonization` | Fig. 7: progressive skeletonization | `monocular_gaussian/progressive_skeleton.yaml` |
 | `partmm_runtime` | Fig. R.2: runtime | `mesh/runtime.yaml` |
 
-## Current Numeric Status
-
-Novel-view synthesis (Table 2) is intentionally excluded from this pass. The
-remaining camera-ready tables have the following reproducibility status as of
-2026-09-11:
-
-| Table | Status | Evidence and remaining work |
-| --- | --- | --- |
-| Table 3: human unseen poses | Deferred for source release | Code and configs are retained; the printed table is not verified. Historical evidence and protocol differences remain in `catalog.yaml`. |
-| Table 4: VTO and D4D animation | Partial | Every configured job completes. VTO PartMM (both garments), VTO Dress FullMM, and the two historical D4D proxy fields match at displayed precision; the remaining baselines or protocols differ as recorded in `catalog.yaml`. |
-| Table 5: patch length | Verified | Fresh per-case evaluation gives 17.17, 16.80, 17.36, 18.79, and 20.56 mm, exactly matching all displayed entries. |
-| Table R.1: database size | Partial | RMSE and peak GPU-memory columns match all entries; pose coverage is close, while wall-clock timing is hardware-sensitive and does not match every paper value. |
-
 ## SSDR Followed by PSNR
 
 The direct path is **reconstructed Gaussian trajectories -> SSDR -> rendered
