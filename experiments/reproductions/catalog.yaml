@@ -1,0 +1,106 @@
+schema_version: 1
+scope: local_reproductions
+policy:
+  checked_in:
+    - executable experiment configs
+    - locally authored adapters
+    - normalized numerical results
+    - source revisions and result hashes
+  excluded:
+    - datasets
+    - checkpoints
+    - rendered image directories
+    - third-party repositories
+workspaces:
+  - paper: DressRecon
+    repository: https://github.com/jefftan969/dressrecon
+    revision: 91b3b79
+    coverage: code_and_metrics
+  - paper: Robust Skin Weights Transfer
+    repository: https://github.com/rin-23/RobustSkinWeightsTransferCode
+    revision: a60263c
+    coverage: metrics_and_external_adapter
+  - paper: DG-Mesh
+    repository: https://github.com/Isabella98Liu/DG-Mesh
+    revision: 754f42c
+    coverage: cross_method_metrics
+  - paper: 4D Gaussian Splatting
+    repository: https://github.com/hustvl/4DGaussians
+    revision: 843d5ac
+    coverage: paper_matrix_external_artifact
+  - paper: SC-GS
+    repository: https://github.com/yihua7/SC-GS
+    revision: 26cd57d
+    coverage: cross_method_metrics
+  - paper: Articulated Point-NeRF
+    repository: https://github.com/lukasuz/Articulated-Point-NeRF
+    revision: 3a0c364
+    coverage: paper_matrix_external_artifact
+  - paper: Deform-2DGS
+    repository: https://github.com/Net-Maker/Deform-2DGS
+    revision: 16a7093
+    coverage: observation_split_and_cross_method_metrics
+  - paper: Deformable 3D Gaussians
+    repository: https://github.com/ingra14m/Deformable-3D-Gaussians
+    revision: ac42372
+    coverage: cross_method_metrics
+  - paper: Dynamic 2D Gaussians
+    repository: https://github.com/hustvl/Dynamic-2DGS
+    revision: 4355abb
+    coverage: cross_method_metrics
+  - paper: GaussianAnimator
+    repository: https://github.com/Net-Maker/GaussianAnimator
+    revision: 57b791a
+    coverage: cross_method_metrics
+  - paper: RigGS
+    repository: https://github.com/yaoyx689/RigGS
+    revision: 2ce695b
+    coverage: paper_matrix_and_cross_method_metrics
+reproductions:
+  - id: dressrecon_original_dna
+    paper: DressRecon
+    status: result_backed
+    config: dressrecon_original.yaml
+    result: results/dressrecon_original.json
+    source_revision: 91b3b79
+  - id: dressrecon_bob_d3dgs
+    paper: DressRecon / Bag of Bones
+    status: code_and_result_backed
+    config: human_novel_pose.yaml
+    recompute_config: dressrecon_bob_recompute.yaml
+    result: results/human_novel_pose.json
+    source_revision: 91b3b79
+    evaluation_revision: 7dbbd4d
+    result_coverage:
+      dna_rendering: 8/8
+      actorshq: 10/10
+    current_recompute_assets:
+      dna_rendering: 8/8
+      actorshq: 1/10
+    note: ActorsHQ BoB metrics are complete, but most raw fitting assets are no longer present on this workstation. The historical SSDR evaluation must not be presented as PartMM.
+  - id: robust_skin_transfer_d3dgs
+    paper: Robust Skin Weights Transfer
+    status: result_backed
+    config: human_novel_pose.yaml
+    result: results/human_novel_pose.json
+    source_revision: a60263c
+  - id: cross_method_skeletonization
+    paper: Dynamic reconstruction compatibility study
+    status: partial_result_backed
+    config: cross_method_skeletonization.yaml
+    result: results/cross_method_skeletonization.json
+    note: Timeouts and partial runs are retained explicitly.
+    methods:
+      - DG-Mesh@754f42c
+      - GaussianAnimator@57b791a
+      - Deform-2DGS@16a7093
+      - Deformable-3D-Gaussians@ac42372
+      - Dynamic-2DGS@4355abb
+      - SC-GS@26cd57d
+      - RigGS@2ce695b
+  - id: deform2dgs_observation_split
+    paper: Deform-2DGS
+    status: result_backed_with_incomplete_cases
+    config: deform2dgs_observation_split.yaml
+    result: results/deform2dgs_observation_split.json
+    source_revision: 16a7093

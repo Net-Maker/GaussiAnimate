@@ -1,0 +1,272 @@
+{
+  "averages": {
+    "dressrecon": {
+      "metrics": {
+        "lpips": 0.07793079792034058,
+        "psnr": 30.1832454755485,
+        "ssim": 0.9344111560667335
+      },
+      "sequence_count": 14
+    },
+    "dressrecon_motion_matching": {
+      "metrics": {
+        "lpips": 0.11189100512318195,
+        "psnr": 24.497634941132603,
+        "ssim": 0.8715199323147087
+      },
+      "sequence_count": 14
+    }
+  },
+  "description": "DressRecon baseline and local motion-matching extension.",
+  "evidence": {
+    "repository": {
+      "revision": "91b3b79",
+      "url": "https://github.com/jefftan969/dressrecon"
+    },
+    "result_file": "batch_evaluation_results.json",
+    "sha256": "65bbd7467cdf830aed39bee2cafca310c7cccff42385aba09d2a9150c9b66d1d"
+  },
+  "per_sequence": {
+    "dna_0008_01": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.06481298555930455,
+          "psnr": 29.26020201517774,
+          "ssim": 0.917536800843772
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.11343313443164031,
+          "psnr": 23.13237370023408,
+          "ssim": 0.831830395665975
+        }
+      },
+      "num_evaluated": 6,
+      "num_test_frames": 6,
+      "source_sequence": "dna-0008_01"
+    },
+    "dna_0047_01": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.1279802628689342,
+          "psnr": 25.18893549936829,
+          "ssim": 0.8896675675661463
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.15630606644683415,
+          "psnr": 20.99642149251641,
+          "ssim": 0.7946004404864818
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0047_01"
+    },
+    "dna_0047_12": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.06006427605946859,
+          "psnr": 30.497917261117703,
+          "ssim": 0.9404544046821146
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.09327834844589233,
+          "psnr": 25.016390534890405,
+          "ssim": 0.8705631793540047
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0047_12"
+    },
+    "dna_0102_02": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.040930484938952655,
+          "psnr": 29.2602606043519,
+          "ssim": 0.9312438484196248
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.09392576002412373,
+          "psnr": 20.62860350081563,
+          "ssim": 0.8415281745795383
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0102_02"
+    },
+    "dna_0113_06": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.4094590511586931,
+          "psnr": 24.24861743916388,
+          "ssim": 0.8084250548999837
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.4094590511586931,
+          "psnr": 24.24861743916388,
+          "ssim": 0.8084250548999837
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0113_06"
+    },
+    "dna_0121_02": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.054839479426542916,
+          "psnr": 27.238714274451226,
+          "ssim": 0.9482572834700357
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.09365792406929864,
+          "psnr": 21.844762419770806,
+          "ssim": 0.8945546766299333
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0121_02"
+    },
+    "dna_0123_02": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.03594940217832724,
+          "psnr": 30.530483941900343,
+          "ssim": 0.9587761257483961
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.09904753044247627,
+          "psnr": 22.359540758037078,
+          "ssim": 0.8589638905747653
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0123_02"
+    },
+    "dna_0128_04": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.053859778162505895,
+          "psnr": 30.975723617760462,
+          "ssim": 0.9482637313435881
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.10731168215473492,
+          "psnr": 23.26630134160451,
+          "ssim": 0.8597008442795203
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0128_04"
+    },
+    "dna_0133_07": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.029301755958133273,
+          "psnr": 34.20597584351333,
+          "ssim": 0.9689570244051708
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.04443950206041336,
+          "psnr": 29.48035370329292,
+          "ssim": 0.9310877254689474
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0133_07"
+    },
+    "dna_0152_01": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.025098298572831683,
+          "psnr": 37.11173992784428,
+          "ssim": 0.9675034019924242
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.03643623739480972,
+          "psnr": 31.930411055662496,
+          "ssim": 0.9359081039509499
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0152_01"
+    },
+    "dna_0166_04": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.03480722258488337,
+          "psnr": 31.647447680994592,
+          "ssim": 0.9622074574496922
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.07831363897356722,
+          "psnr": 25.203675111403623,
+          "ssim": 0.8875499745212332
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0166_04"
+    },
+    "dna_0188_02": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.05810186838110288,
+          "psnr": 30.823964442565035,
+          "ssim": 0.9534079799949376
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.0907125194867452,
+          "psnr": 25.193250537894322,
+          "ssim": 0.9013292473340286
+        }
+      },
+      "num_evaluated": 45,
+      "num_test_frames": 45,
+      "source_sequence": "dna-0188_02"
+    },
+    "dna_0206_04": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.06163721614413791,
+          "psnr": 30.34626138916595,
+          "ssim": 0.9438283278974746
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.09353582974937227,
+          "psnr": 24.29531927299204,
+          "ssim": 0.8916474080368069
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0206_04"
+    },
+    "dna_0239_01": {
+      "methods": {
+        "dressrecon": {
+          "lpips": 0.03418908889094988,
+          "psnr": 31.229192720304265,
+          "ssim": 0.9432271762209089
+        },
+        "dressrecon_motion_matching": {
+          "lpips": 0.056616846885946065,
+          "psnr": 25.370868307578224,
+          "ssim": 0.8935899366237532
+        }
+      },
+      "num_evaluated": 9,
+      "num_test_frames": 9,
+      "source_sequence": "dna-0239_01"
+    }
+  },
+  "reproduction_id": "dressrecon_original_dna",
+  "schema_version": 1,
+  "total_evaluated_frames": 159
+}

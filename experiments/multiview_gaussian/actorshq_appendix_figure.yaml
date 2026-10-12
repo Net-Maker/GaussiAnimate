@@ -1,0 +1,79 @@
+schema_version: 1
+kind: qualitative_figure
+figure:
+  id: actorshq_appendix_figure
+  paper_target: Appendix ActorsHQ qualitative comparison (fig:actorshq)
+  source_policy: explicit_external
+methods:
+  - {id: gt, label: GT}
+  - {id: d3dgs, label: D3DGS}
+  - {id: bob, label: BoB}
+  - {id: partmm, label: Ours}
+  - {id: lbs, label: LBS}
+rows:
+  - {id: subject_1_view_1, label: Subject 1 / View 1}
+  - {id: subject_1_view_2, label: Subject 1 / View 2}
+  - {id: subject_2_view_1, label: Subject 2 / View 1}
+  - {id: subject_2_view_2, label: Subject 2 / View 2}
+  - {id: subject_3_view_1, label: Subject 3 / View 1}
+  - {id: subject_3_view_2, label: Subject 3 / View 2}
+layout:
+  method_order: [gt, d3dgs, bob, partmm, lbs]
+  row_order:
+    - subject_1_view_1
+    - subject_1_view_2
+    - subject_2_view_1
+    - subject_2_view_2
+    - subject_3_view_1
+    - subject_3_view_2
+  background: white
+  cell_size: [300, 360]
+  padding: 24
+  gap: 8
+  header_height: 52
+  row_label_width: 150
+  row_label_orientation: horizontal
+panels:
+  subject_1_view_1:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_1/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_1/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_1/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_1/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_1/lbs.png
+  subject_1_view_2:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_2/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_2/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_2/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_2/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_1/view_2/lbs.png
+  subject_2_view_1:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_1/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_1/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_1/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_1/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_1/lbs.png
+  subject_2_view_2:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_2/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_2/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_2/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_2/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_2/view_2/lbs.png
+  subject_3_view_1:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_1/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_1/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_1/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_1/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_1/lbs.png
+  subject_3_view_2:
+    gt: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_2/gt.png
+    d3dgs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_2/d3dgs.png
+    bob: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_2/bob.png
+    partmm: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_2/partmm.png
+    lbs: ${GA_ACTORSHQ_APPENDIX_PANEL_ROOT}/subject_3/view_2/lbs.png
+output:
+  image: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/actorshq_appendix.png
+  provenance: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/actorshq_appendix.provenance.json
+reference:
+  path: ${GA_PAPER_ROOT:-~/research/code/GA_arxiv}/PDFs/actorshq_more.pdf
+  role: comparison only; never used as a result panel
+  blocker_note: Exact per-method source renders for all three subjects were not recovered.

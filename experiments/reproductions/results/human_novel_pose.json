@@ -1,0 +1,814 @@
+{
+  "by_dataset": {
+    "actorshq": {
+      "methods": {
+        "d3dgs_gt": {
+          "metrics": {
+            "fg_psnr": 25.43316766470671,
+            "lpips": 0.13601351638472464,
+            "psnr": 30.55838762919108,
+            "ssim": 0.9377048254013062
+          },
+          "sequence_count": 10
+        },
+        "smpl_bob": {
+          "metrics": {
+            "fg_psnr": 13.437632740785679,
+            "lpips": 0.2593879158523244,
+            "psnr": 16.65850118001302,
+            "ssim": 0.7221186459064484
+          },
+          "sequence_count": 10
+        },
+        "smpl_lbs": {
+          "metrics": {
+            "fg_psnr": 13.484198287626107,
+            "lpips": 0.3149340995140227,
+            "psnr": 17.539616248508295,
+            "ssim": 0.7384030520915985
+          },
+          "sequence_count": 10
+        },
+        "ssdr_reconstruction": {
+          "metrics": {
+            "fg_psnr": 17.55332984427611,
+            "lpips": 0.19943869526782804,
+            "psnr": 22.464739560087523,
+            "ssim": 0.8245186269283294
+          },
+          "sequence_count": 10
+        }
+      },
+      "sequence_count": 10
+    },
+    "dna_rendering": {
+      "methods": {
+        "d3dgs_gt": {
+          "metrics": {
+            "fg_psnr": 20.28175074234605,
+            "lpips": 0.03317397607994887,
+            "psnr": 32.158608824014664,
+            "ssim": 0.9783660098910332
+          },
+          "sequence_count": 8
+        },
+        "smpl_bob": {
+          "metrics": {
+            "fg_psnr": 12.221361632769307,
+            "lpips": 0.05760393680538982,
+            "psnr": 23.028511859476566,
+            "ssim": 0.9348215386271477
+          },
+          "sequence_count": 8
+        },
+        "smpl_lbs": {
+          "metrics": {
+            "fg_psnr": 12.875585413227478,
+            "lpips": 0.04894510584805782,
+            "psnr": 24.10459858303269,
+            "ssim": 0.9474611282348633
+          },
+          "sequence_count": 8
+        },
+        "ssdr_reconstruction": {
+          "metrics": {
+            "fg_psnr": 16.528364989285667,
+            "lpips": 0.039618733177970475,
+            "psnr": 28.276235001782577,
+            "ssim": 0.9638952538371086
+          },
+          "sequence_count": 8
+        }
+      },
+      "sequence_count": 8
+    }
+  },
+  "description": "D3DGS oracle, robust LBS, local DressRecon BoB, and an SSDR reconstruction diagnostic evaluated on the paper's human split.",
+  "evidence": {
+    "bob_and_oracle": {
+      "repository": {
+        "revision": "7dbbd4d",
+        "url": "https://github.com/JonathonLuiten/Dynamic3DGaussians"
+      },
+      "result_file": "summary.json",
+      "sha256": "6c6c1d64003b1f43ad96f1c56def7316395bb7181de20370bb1f5262e7b0f785"
+    },
+    "lbs_actorshq": {
+      "repository": {
+        "revision": "7dbbd4d",
+        "url": "https://github.com/JonathonLuiten/Dynamic3DGaussians"
+      },
+      "result_file": "summary.json",
+      "sha256": "34b4dad6802f9e68f22fc394fed10049aa5631a3676dacc0444a06340d1a5522"
+    },
+    "lbs_dna": {
+      "repository": {
+        "revision": "7dbbd4d",
+        "url": "https://github.com/JonathonLuiten/Dynamic3DGaussians"
+      },
+      "result_file": "summary.json",
+      "sha256": "dd66dc57a18eb3c821ab827be49805bf3c5b696ed4875686ee27966982874d44"
+    },
+    "ssdr_reconstruction": {
+      "repository": {
+        "revision": "7dbbd4d",
+        "url": "https://github.com/JonathonLuiten/Dynamic3DGaussians"
+      },
+      "result_file": "summary.json",
+      "sha256": "a2d56efc6cda6a3b0cee47ed2d4d68a42248a020134a38e07cf0b48ba1cef16f"
+    }
+  },
+  "notes": [
+    "DNA robust-LBS evidence uses the corrected lbs_eval_v2 run.",
+    "ActorsHQ robust-LBS evidence uses the server lbs_eval run.",
+    "The source previously labelled PartMM is eval_ssdr_metrics.py: it reconstructs an SSDR cache fitted on all frames and performs no PartMM retrieval. It is retained only as an invalid proxy."
+  ],
+  "paper_consistency": {
+    "actorshq": {
+      "smpl_bob": {
+        "delta": {
+          "lpips": 0.0003879158523243942,
+          "psnr": -0.0014988199869812036,
+          "ssim": 0.00011864590644838913
+        },
+        "measured_method": "smpl_bob",
+        "paper": {
+          "lpips": 0.259,
+          "psnr": 16.66,
+          "ssim": 0.722
+        },
+        "status": "matches_rounded_paper"
+      },
+      "smpl_lbs": {
+        "delta": {
+          "lpips": -6.590048597732157e-05,
+          "psnr": -0.00038375149170377654,
+          "ssim": 0.0004030520915985214
+        },
+        "measured_method": "smpl_lbs",
+        "paper": {
+          "lpips": 0.315,
+          "psnr": 17.54,
+          "ssim": 0.738
+        },
+        "status": "matches_rounded_paper"
+      },
+      "smpl_partmm": {
+        "delta": {
+          "lpips": 0.01743869526782804,
+          "psnr": -1.7952604399124787,
+          "ssim": -0.025481373071670532
+        },
+        "measured_method": "ssdr_reconstruction",
+        "paper": {
+          "lpips": 0.182,
+          "psnr": 24.26,
+          "ssim": 0.85
+        },
+        "status": "invalid_proxy_mismatch"
+      }
+    },
+    "dna_rendering": {
+      "smpl_bob": {
+        "delta": {
+          "lpips": 0.0006039368053898167,
+          "psnr": -0.0014881405234348222,
+          "ssim": -0.00017846137285237873
+        },
+        "measured_method": "smpl_bob",
+        "paper": {
+          "lpips": 0.057,
+          "psnr": 23.03,
+          "ssim": 0.935
+        },
+        "status": "matches_rounded_paper"
+      },
+      "smpl_lbs": {
+        "delta": {
+          "lpips": -5.4894151942180835e-05,
+          "psnr": 0.0045985830326884525,
+          "ssim": -0.0005388717651366726
+        },
+        "measured_method": "smpl_lbs",
+        "paper": {
+          "lpips": 0.049,
+          "psnr": 24.1,
+          "ssim": 0.948
+        },
+        "status": "matches_rounded_paper"
+      },
+      "smpl_partmm": {
+        "delta": {
+          "lpips": -0.00038126682202952594,
+          "psnr": -0.0037649982174237095,
+          "ssim": -0.00010474616289135597
+        },
+        "measured_method": "ssdr_reconstruction",
+        "paper": {
+          "lpips": 0.04,
+          "psnr": 28.28,
+          "ssim": 0.964
+        },
+        "status": "invalid_proxy_matches_number"
+      }
+    }
+  },
+  "per_sequence": {
+    "actorshq_actor01_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 25.792659481366474,
+          "lpips": 0.12616838350271184,
+          "psnr": 30.782905439535778,
+          "ssim": 0.9351142644882202
+        },
+        "smpl_bob": {
+          "fg_psnr": 14.198067312439283,
+          "lpips": 0.2433892833068967,
+          "psnr": 17.51545326411724,
+          "ssim": 0.7404041290283203
+        },
+        "smpl_lbs": {
+          "fg_psnr": 15.01630803445975,
+          "lpips": 0.2663062688584129,
+          "psnr": 19.28556025524934,
+          "ssim": 0.781230092048645,
+          "vertex_rmse_mm": 65.53775024414062
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 18.263610397775967,
+          "lpips": 0.17557553357134262,
+          "psnr": 23.61855047941208,
+          "ssim": 0.841424286365509,
+          "vertex_rmse_mm": 10.170754432678223
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor01_seq2": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 22.466746012369793,
+          "lpips": 0.15094768105312065,
+          "psnr": 32.78474654754003,
+          "ssim": 0.9157750606536865
+        },
+        "smpl_bob": {
+          "fg_psnr": 10.782880117495855,
+          "lpips": 0.3189145006627465,
+          "psnr": 15.548164963722229,
+          "ssim": 0.6413305997848511
+        },
+        "smpl_lbs": {
+          "fg_psnr": 10.340208413700262,
+          "lpips": 0.3663955856299424,
+          "psnr": 20.14453326165676,
+          "ssim": 0.6763868927955627,
+          "vertex_rmse_mm": 1355.95263671875
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 13.007179223001003,
+          "lpips": 0.2316949763930514,
+          "psnr": 23.311167230208714,
+          "ssim": 0.7689465880393982,
+          "vertex_rmse_mm": 28.19777488708496
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor02_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 25.38205764691035,
+          "lpips": 0.12629034320513408,
+          "psnr": 30.42230824629466,
+          "ssim": 0.9497590661048889
+        },
+        "smpl_bob": {
+          "fg_psnr": 13.815906365712484,
+          "lpips": 0.25718161097417275,
+          "psnr": 16.99866597354412,
+          "ssim": 0.731939971446991
+        },
+        "smpl_lbs": {
+          "fg_psnr": 13.822808916370073,
+          "lpips": 0.2768096304809054,
+          "psnr": 18.587263117233913,
+          "ssim": 0.7778427004814148,
+          "vertex_rmse_mm": 63.91552734375
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 18.40017534295718,
+          "lpips": 0.18209512382745743,
+          "psnr": 23.079523702462513,
+          "ssim": 0.8483019471168518,
+          "vertex_rmse_mm": 8.645076751708984
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor02_seq2": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 25.140501081943512,
+          "lpips": 0.13182887711251776,
+          "psnr": 30.064054836829502,
+          "ssim": 0.9451830983161926
+        },
+        "smpl_bob": {
+          "fg_psnr": 13.71317090590795,
+          "lpips": 0.26596987328181665,
+          "psnr": 16.99873374402523,
+          "ssim": 0.7203529477119446
+        },
+        "smpl_lbs": {
+          "fg_psnr": 14.39113274216652,
+          "lpips": 0.29329558039704956,
+          "psnr": 18.622213547428448,
+          "ssim": 0.7662712931632996,
+          "vertex_rmse_mm": 435.68927001953125
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 12.15206523736318,
+          "lpips": 0.29851945241292316,
+          "psnr": 14.415289382139841,
+          "ssim": 0.6812388300895691,
+          "vertex_rmse_mm": 241.24951171875
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor04_seq2": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 26.391129742066067,
+          "lpips": 0.10237730164080858,
+          "psnr": 30.851367612679798,
+          "ssim": 0.9632455706596375
+        },
+        "smpl_bob": {
+          "fg_psnr": 12.731975868344307,
+          "lpips": 0.21189259157205623,
+          "psnr": 16.061890666683514,
+          "ssim": 0.769134521484375
+        },
+        "smpl_lbs": {
+          "fg_psnr": 13.431474124391874,
+          "lpips": 0.27558864656214915,
+          "psnr": 16.51884665588538,
+          "ssim": 0.778499960899353,
+          "vertex_rmse_mm": 266.1426696777344
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 17.65766078233719,
+          "lpips": 0.14487863710771004,
+          "psnr": 23.388857692480087,
+          "ssim": 0.8832298517227173,
+          "vertex_rmse_mm": 13.153124809265137
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor05_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 26.45890619357427,
+          "lpips": 0.1584735296977063,
+          "psnr": 30.673345526059467,
+          "ssim": 0.9252989292144775
+        },
+        "smpl_bob": {
+          "fg_psnr": 14.15736781557401,
+          "lpips": 0.2769448359807332,
+          "psnr": 16.741594766577084,
+          "ssim": 0.7071646451950073
+        },
+        "smpl_lbs": {
+          "fg_psnr": 13.635414282480875,
+          "lpips": 0.36164758844921985,
+          "psnr": 15.999177888035774,
+          "ssim": 0.6985598206520081,
+          "vertex_rmse_mm": 110.91742706298828
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 22.829940458138783,
+          "lpips": 0.18894995770727593,
+          "psnr": 26.74227683742841,
+          "ssim": 0.8732945919036865,
+          "vertex_rmse_mm": 9.316347122192383
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor06_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 25.672901595632236,
+          "lpips": 0.14224415148297945,
+          "psnr": 29.437477310498554,
+          "ssim": 0.9375438690185547
+        },
+        "smpl_bob": {
+          "fg_psnr": 13.932105434437593,
+          "lpips": 0.24859963754812878,
+          "psnr": 16.86470092833042,
+          "ssim": 0.7393868565559387
+        },
+        "smpl_lbs": {
+          "fg_psnr": 14.357122038801512,
+          "lpips": 0.3056726216028134,
+          "psnr": 17.009992798169453,
+          "ssim": 0.7494637370109558,
+          "vertex_rmse_mm": 60.008445739746094
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 21.079749311010044,
+          "lpips": 0.174375348786513,
+          "psnr": 24.89255369702975,
+          "ssim": 0.8835123777389526,
+          "vertex_rmse_mm": 9.587984085083008
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor06_seq2": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 25.65683059891065,
+          "lpips": 0.14371823746090134,
+          "psnr": 29.59531642993291,
+          "ssim": 0.9368849396705627
+        },
+        "smpl_bob": {
+          "fg_psnr": 13.780908534924189,
+          "lpips": 0.2546576665093501,
+          "psnr": 16.49169985453288,
+          "ssim": 0.7259119749069214
+        },
+        "smpl_lbs": {
+          "fg_psnr": 13.14357552677393,
+          "lpips": 0.3423611319934328,
+          "psnr": 15.682283570369085,
+          "ssim": 0.7064570188522339,
+          "vertex_rmse_mm": 220.39280700683594
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 12.767996770640215,
+          "lpips": 0.23614832336703936,
+          "psnr": 16.157056987285614,
+          "ssim": 0.7646273374557495,
+          "vertex_rmse_mm": 87.92932891845703
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor07_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 26.596813430388767,
+          "lpips": 0.1427539094351232,
+          "psnr": 31.28844650586446,
+          "ssim": 0.933381199836731
+        },
+        "smpl_bob": {
+          "fg_psnr": 15.149401972691217,
+          "lpips": 0.2434125170422097,
+          "psnr": 18.523423825701077,
+          "ssim": 0.7469649910926819
+        },
+        "smpl_lbs": {
+          "fg_psnr": 14.821827128529549,
+          "lpips": 0.2998701569934686,
+          "psnr": 18.439256529013317,
+          "ssim": 0.7441347241401672,
+          "vertex_rmse_mm": 88.37336730957031
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 19.961141407489777,
+          "lpips": 0.190242239429305,
+          "psnr": 24.7245305677255,
+          "ssim": 0.8377402424812317,
+          "vertex_rmse_mm": 8.03642463684082
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "actorshq_actor08_seq1": {
+      "dataset": "actorshq",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 24.773130863904953,
+          "lpips": 0.1353327492562433,
+          "psnr": 29.683907836675644,
+          "ssim": 0.9348622560501099
+        },
+        "smpl_bob": {
+          "fg_psnr": 12.114543080329895,
+          "lpips": 0.2729166416451335,
+          "psnr": 14.84068381289641,
+          "ssim": 0.6985958218574524
+        },
+        "smpl_lbs": {
+          "fg_psnr": 11.882111668586731,
+          "lpips": 0.36139378417283297,
+          "psnr": 15.107034862041473,
+          "ssim": 0.705184280872345,
+          "vertex_rmse_mm": 128.06484985351562
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 19.413779512047768,
+          "lpips": 0.17190736007566254,
+          "psnr": 24.31758902470271,
+          "ssim": 0.8628702163696289,
+          "vertex_rmse_mm": 8.353299140930176
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 60
+    },
+    "dna_0012_11": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 21.82954614361127,
+          "lpips": 0.02573426199766497,
+          "psnr": 34.16614677508672,
+          "ssim": 0.9847193360328674
+        },
+        "smpl_bob": {
+          "fg_psnr": 13.01799034078916,
+          "lpips": 0.042464933606485525,
+          "psnr": 24.28307209412257,
+          "ssim": 0.9564043879508972
+        },
+        "smpl_lbs": {
+          "fg_psnr": 14.850226283073425,
+          "lpips": 0.03587148264050484,
+          "psnr": 26.660114288330078,
+          "ssim": 0.9660875201225281,
+          "vertex_rmse_mm": 126.45505368709564
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 21.364318470160168,
+          "lpips": 0.026469130938251813,
+          "psnr": 33.60994851589203,
+          "ssim": 0.9831188321113586,
+          "vertex_rmse_mm": 2.4912329390645027
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0013_01": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 19.398432821035385,
+          "lpips": 0.03335935746630033,
+          "psnr": 31.47573830684026,
+          "ssim": 0.9776722192764282
+        },
+        "smpl_bob": {
+          "fg_psnr": 10.531488850712776,
+          "lpips": 0.06139581305906176,
+          "psnr": 21.58280509710312,
+          "ssim": 0.9256746172904968
+        },
+        "smpl_lbs": {
+          "fg_psnr": 12.25051744778951,
+          "lpips": 0.04897551617274682,
+          "psnr": 23.764600495497387,
+          "ssim": 0.9455353021621704,
+          "vertex_rmse_mm": 117.43438988924026
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 14.90137991309166,
+          "lpips": 0.04115294061290721,
+          "psnr": 26.983187834421795,
+          "ssim": 0.9595166444778442,
+          "vertex_rmse_mm": 12.452460825443268
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0013_03": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 19.86419904232025,
+          "lpips": 0.034623112576082346,
+          "psnr": 31.290573457876842,
+          "ssim": 0.9759613275527954
+        },
+        "smpl_bob": {
+          "fg_psnr": 11.286183819174767,
+          "lpips": 0.0661727194674313,
+          "psnr": 21.809894690910976,
+          "ssim": 0.9203336238861084
+        },
+        "smpl_lbs": {
+          "fg_psnr": 12.733882308006287,
+          "lpips": 0.05594054919977983,
+          "psnr": 23.134183446566265,
+          "ssim": 0.9357796907424927,
+          "vertex_rmse_mm": 170.622780919075
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 17.61441993713379,
+          "lpips": 0.03913580250615875,
+          "psnr": 28.825700124104817,
+          "ssim": 0.965337872505188,
+          "vertex_rmse_mm": 8.452802896499634
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0013_09": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 22.36097001036008,
+          "lpips": 0.026143278181552886,
+          "psnr": 35.199741999308266,
+          "ssim": 0.9847452640533447
+        },
+        "smpl_bob": {
+          "fg_psnr": 14.883928537368774,
+          "lpips": 0.04206831095119317,
+          "psnr": 27.047658185164135,
+          "ssim": 0.957604706287384
+        },
+        "smpl_lbs": {
+          "fg_psnr": 13.990291575590769,
+          "lpips": 0.03972860965877771,
+          "psnr": 26.66560262441635,
+          "ssim": 0.9595813751220703,
+          "vertex_rmse_mm": 141.631618142128
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 20.32426791389783,
+          "lpips": 0.02986063058488071,
+          "psnr": 32.96450068553289,
+          "ssim": 0.9778517484664917,
+          "vertex_rmse_mm": 4.165323451161385
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0013_11": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 19.068240384260815,
+          "lpips": 0.028169039621328315,
+          "psnr": 31.004056135813396,
+          "ssim": 0.9815896153450012
+        },
+        "smpl_bob": {
+          "fg_psnr": 11.326045036315918,
+          "lpips": 0.05189364325876037,
+          "psnr": 21.575787246227264,
+          "ssim": 0.9415930509567261
+        },
+        "smpl_lbs": {
+          "fg_psnr": 12.965250472227732,
+          "lpips": 0.0425781308983763,
+          "psnr": 23.616650223731995,
+          "ssim": 0.9551531672477722,
+          "vertex_rmse_mm": 101.1585220694542
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 15.293952415386835,
+          "lpips": 0.033643937498951955,
+          "psnr": 27.03211392958959,
+          "ssim": 0.9699036478996277,
+          "vertex_rmse_mm": 5.937561858445406
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0019_08": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 21.565741171439488,
+          "lpips": 0.032499383032942815,
+          "psnr": 33.70679569244385,
+          "ssim": 0.9788392782211304
+        },
+        "smpl_bob": {
+          "fg_psnr": 15.82794420917829,
+          "lpips": 0.04202292434250315,
+          "psnr": 27.35495271285375,
+          "ssim": 0.9562713503837585
+        },
+        "smpl_lbs": {
+          "fg_psnr": 14.057262311379114,
+          "lpips": 0.044818187784403565,
+          "psnr": 25.594772438208263,
+          "ssim": 0.9506484866142273,
+          "vertex_rmse_mm": 83.35395902395248
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 17.3094342648983,
+          "lpips": 0.03863250774641832,
+          "psnr": 29.181088387966156,
+          "ssim": 0.9616404175758362,
+          "vertex_rmse_mm": 9.76444873958826
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0021_03": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 19.33220209678014,
+          "lpips": 0.03894441669496397,
+          "psnr": 30.94280805190404,
+          "ssim": 0.9738720655441284
+        },
+        "smpl_bob": {
+          "fg_psnr": 10.676312600572905,
+          "lpips": 0.08073151061932246,
+          "psnr": 20.928895165522892,
+          "ssim": 0.906747579574585
+        },
+        "smpl_lbs": {
+          "fg_psnr": 11.276231606801352,
+          "lpips": 0.05771807177613179,
+          "psnr": 22.764588594436646,
+          "ssim": 0.9389146566390991,
+          "vertex_rmse_mm": 902.8526544570923
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 13.765750795602798,
+          "lpips": 0.05178203356141845,
+          "psnr": 24.730504155158997,
+          "ssim": 0.9489523768424988,
+          "vertex_rmse_mm": 29.84525077044964
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    },
+    "dna_0023_06": {
+      "dataset": "dna_rendering",
+      "methods": {
+        "d3dgs_gt": {
+          "fg_psnr": 18.834674268960953,
+          "lpips": 0.04591895906875531,
+          "psnr": 29.483010172843933,
+          "ssim": 0.9695289731025696
+        },
+        "smpl_bob": {
+          "fg_psnr": 10.220999668041864,
+          "lpips": 0.07408163913836081,
+          "psnr": 19.645029683907826,
+          "ssim": 0.9139429926872253
+        },
+        "smpl_lbs": {
+          "fg_psnr": 10.88102130095164,
+          "lpips": 0.06593029865374168,
+          "psnr": 20.63627655307452,
+          "ssim": 0.9279888272285461,
+          "vertex_rmse_mm": 351.51660442352295
+        },
+        "ssdr_reconstruction": {
+          "fg_psnr": 11.65339620411396,
+          "lpips": 0.05627288197477658,
+          "psnr": 22.88283638159434,
+          "ssim": 0.9448404908180237,
+          "vertex_rmse_mm": 13.187465257942677
+        }
+      },
+      "num_eval_cams": 4,
+      "num_test_frames": 30
+    }
+  },
+  "reproduction_id": "human_novel_pose_local_reproductions",
+  "schema_version": 1
+}

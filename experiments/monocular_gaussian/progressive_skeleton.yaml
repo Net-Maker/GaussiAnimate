@@ -1,0 +1,65 @@
+schema_version: 2
+experiment:
+  id: progressive_skeleton
+  target_id: progressive_skeletonization
+  title: Progressive skeletonization with increasing observations
+  paper_target: Fig. 9 / fig:progressive
+  seed: 42
+output_dir: ../runs/progressive_skeleton
+datasets:
+  - id: dgmesh
+    label: DG-Mesh T-Rex
+    cases:
+      - {id: p0, sequence: trex, percentage: 0, frame_count: 1}
+      - {id: p30, sequence: trex, percentage: 30, frame_count: 60}
+      - {id: p60, sequence: trex, percentage: 60, frame_count: 120}
+      - {id: p80, sequence: trex, percentage: 80, frame_count: 160}
+      - {id: p100, sequence: trex, percentage: 100, frame_count: 200}
+methods:
+  - id: progressive_skelebone
+    label: GaussiAnimate
+    mode: native
+    stages:
+      - id: export
+        type: export_riggs
+        frame_dir: "${GA_RIGGS_ROOT:-~/research/GA/RigGS}/saved_final_results_for_skeleton/{case.sequence}_512_final_node/deformed_pointclouds"
+        pattern: frame_*.ply
+        max_points: 30000
+        fps: 30
+        output: "{run_dir}/full_sequence.npz"
+        inputs:
+          - "${GA_RIGGS_ROOT:-~/research/GA/RigGS}/saved_final_results_for_skeleton/{case.sequence}_512_final_node/deformed_pointclouds"
+        outputs: ["{run_dir}/full_sequence.npz"]
+      - id: subset
+        type: slice_sequence
+        input: "{run_dir}/full_sequence.npz"
+        output: "{run_dir}/observed_sequence.npz"
+        frame_count: "{case.frame_count}"
+        inputs: ["{run_dir}/full_sequence.npz"]
+        outputs: ["{run_dir}/observed_sequence.npz"]
+      - id: extract
+        type: skelebone
+        sequence: "{run_dir}/observed_sequence.npz"
+        mesh: "${GA_RIGGS_ROOT:-~/research/GA/RigGS}/saved_final_results_for_skeleton/{case.sequence}_512_final_node/mesh/frame_0000_post.ply"
+        output_dir: "{run_dir}/skelebone"
+        result: "{run_dir}/extraction.json"
+        config:
+          num_bones: 50
+          joint_score_threshold: 0.3
+          curve_skeleton_bin: ${GA_CURVE_SKELETON_BIN:-~/research/code/QMAT/build/curve_skeleton}
+        inputs:
+          - "{run_dir}/observed_sequence.npz"
+          - "${GA_RIGGS_ROOT:-~/research/GA/RigGS}/saved_final_results_for_skeleton/{case.sequence}_512_final_node/mesh/frame_0000_post.ply"
+        outputs:
+          - "{run_dir}/skelebone/skelebones.npz"
+          - "{run_dir}/skelebone/manifest.json"
+      - id: collect
+        type: collect_json
+        source: "{run_dir}/skelebone/manifest.json"
+        selectors:
+          inner_joints: representation.inner_joints
+          outer_bones: representation.outer_bones
+          surface_vertices: surface.vertices
+        output: "{run_dir}/ablation_metrics.json"
+        inputs: ["{run_dir}/skelebone/manifest.json"]
+        outputs: ["{run_dir}/ablation_metrics.json"]

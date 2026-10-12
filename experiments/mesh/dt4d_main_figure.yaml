@@ -1,0 +1,55 @@
+schema_version: 1
+kind: qualitative_figure
+figure:
+  id: dt4d_main_figure
+  paper_target: Main paper qualitative D4D comparison (fig:animal_comp)
+  source_policy: historical_only
+methods:
+  - {id: lbs, label: LBS}
+  - {id: gru, label: GRU}
+  - {id: mlp, label: MLP}
+  - {id: fullmm, label: FullMM}
+  - {id: partmm, label: PartMM (Ours)}
+  - {id: gt, label: GT}
+rows:
+  - {id: mesh, label: Mesh}
+  - {id: overlap, label: GT Overlap}
+  - {id: error, label: Error (0-5 mm)}
+layout:
+  method_order: [lbs, gru, mlp, fullmm, partmm, gt]
+  row_order: [mesh, overlap, error]
+  background: white
+  cell_size: [360, 270]
+  padding: 24
+  gap: 10
+  header_height: 52
+  row_label_width: 72
+  row_label_orientation: vertical
+panels:
+  mesh:
+    lbs: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/LBS_uniform.png
+    gru: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/GRUfix_uniform.png
+    mlp: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MLPfix_uniform.png
+    fullmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_full_uniform.png
+    partmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_part_uniform.png
+    gt: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/GT_uniform.png
+  overlap:
+    lbs: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/LBS_overlap.png
+    gru: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/GRUfix_overlap.png
+    mlp: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MLPfix_overlap.png
+    fullmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_full_overlap.png
+    partmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_part_overlap.png
+    gt: null
+  error:
+    lbs: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/LBS_error.png
+    gru: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/GRUfix_error.png
+    mlp: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MLPfix_error.png
+    fullmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_full_error.png
+    partmm: ${GA_DT4D_MAIN_PANEL_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/partmm_strong_advantage_individuals_all/milkcow10L/0013_f13}/MM_part_error.png
+    gt: null
+output:
+  image: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/dt4d_main.png
+  provenance: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/dt4d_main.provenance.json
+reference:
+  path: ${GA_PAPER_ROOT:-~/research/code/GA_arxiv}/PDFs/animal_comparison_milkcow.pdf
+  role: comparison only; never used as a result panel

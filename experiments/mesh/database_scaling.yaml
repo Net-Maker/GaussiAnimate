@@ -1,0 +1,42 @@
+schema_version: 2
+experiment:
+  id: partmm_database_scaling
+  target_id: partmm_database_scaling
+  title: PartMM database accuracy, coverage, and cost
+  paper_target: Table R.1 / PartMM database coverage and cost
+  seed: 42
+output_dir: ../runs/partmm_database_scaling
+datasets:
+  - id: vto_tshirt
+    label: VTO T-shirt
+    protocol: fixed held-out queries with independently fitted SSDR caches
+    cases:
+      - {id: n5, sequences: 5}
+      - {id: n20, sequences: 20}
+      - {id: n50, sequences: 50}
+methods:
+  - id: partmm
+    label: PartMM
+    mode: external
+    stages:
+      - id: evaluate
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        command:
+          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - -m
+          - experiments.mesh.database_scaling
+          - --sequences
+          - "{case.sequences}"
+          - --accuracy-source
+          - ${GA_VTO_SCALING_ACCURACY:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/scalability_results/v2/tshirt_clean_results.json}
+          - --profile-source
+          - "{output_root}/raw/table_r1_profile.json"
+          - --output
+          - "{run_dir}/scaling_metrics.json"
+          - --expected-sizes
+          - 5,20,50
+        inputs:
+          - ${GA_VTO_SCALING_ACCURACY:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/scalability_results/v2/tshirt_clean_results.json}
+          - "{output_root}/raw/table_r1_profile.json"
+        outputs: ["{run_dir}/scaling_metrics.json"]

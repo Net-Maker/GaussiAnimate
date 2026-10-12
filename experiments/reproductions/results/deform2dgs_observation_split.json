@@ -1,0 +1,489 @@
+{
+  "by_variant": {
+    "lbs": {
+      "complete_runs": 6,
+      "incomplete_runs": 0,
+      "metrics_on_complete_runs": {
+        "psnr_10": 20.582144419352215,
+        "psnr_100": 35.19298839569092,
+        "psnr_20": 22.23284371693929,
+        "psnr_30": 23.93549378712972,
+        "psnr_40": 25.729190508524578,
+        "psnr_50": 27.652893384297688,
+        "psnr_60": 29.310553232828777,
+        "psnr_70": 30.925974527994793,
+        "psnr_80": 32.421715100606285,
+        "psnr_90": 33.678783098856606
+      },
+      "total_runs": 6
+    },
+    "split": {
+      "complete_runs": 8,
+      "incomplete_runs": 6,
+      "metrics_on_complete_runs": {
+        "psnr_10": 21.70579695701599,
+        "psnr_100": 35.80382061004639,
+        "psnr_20": 23.62666416168213,
+        "psnr_30": 25.712705850601196,
+        "psnr_40": 27.601470708847046,
+        "psnr_50": 29.588700771331787,
+        "psnr_60": 30.74477481842041,
+        "psnr_70": 31.968806505203247,
+        "psnr_80": 33.815014362335205,
+        "psnr_90": 35.036622047424316
+      },
+      "total_runs": 14
+    }
+  },
+  "description": "Deform-2DGS PSNR as the observed training-frame fraction grows from 10% to 100%.",
+  "evidence": [
+    {
+      "result_file": "exp-lbs-beagle/split_experiments_results.json",
+      "run_id": "lbs_beagle",
+      "sha256": "70c92dc64f623b631ea764e96656450fa3d7cb1a7378c68469ab6b7027d49121"
+    },
+    {
+      "result_file": "exp-lbs-bird/split_experiments_results.json",
+      "run_id": "lbs_bird",
+      "sha256": "af6b080b52f1827b4d6d29dd40d6f933736f1b0f45f49cbff485392b9e6751cc"
+    },
+    {
+      "result_file": "exp-lbs-duck/split_experiments_results.json",
+      "run_id": "lbs_duck",
+      "sha256": "116b7440416c96b6ace9060fff1da0c4220714c673c918d91d8fb9f36dbcbbad"
+    },
+    {
+      "result_file": "exp-lbs-girlwalk/split_experiments_results.json",
+      "run_id": "lbs_girlwalk",
+      "sha256": "a3334b94ee7429123743a3d9ef7c5d6dcfa906f9b938461de7baf67c9ebd971f"
+    },
+    {
+      "result_file": "exp-lbs-horse/split_experiments_results.json",
+      "run_id": "lbs_horse",
+      "sha256": "91d957b46c4f663f569c74dfa72a3e90dd2d7471e1b93b404d455e310bb367e3"
+    },
+    {
+      "result_file": "exp-lbs-torus2sphere/split_experiments_results.json",
+      "run_id": "lbs_torus2sphere",
+      "sha256": "5090184cc3ca8c1b59f0eb365f82b06f2a085a7722a80352e1a417808a566d76"
+    },
+    {
+      "result_file": "exp-split-beagle/split_experiments_results.json",
+      "run_id": "split_beagle",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-bird/split_experiments_results.json",
+      "run_id": "split_bird",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-bouncingballs/split_experiments_results.json",
+      "run_id": "split_bouncingballs",
+      "sha256": "6605a486310799e953520d426834d504033fc1cda7f1f30bc17cd3e8df658353"
+    },
+    {
+      "result_file": "exp-split-duck/split_experiments_results.json",
+      "run_id": "split_duck",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-girlwalk/split_experiments_results.json",
+      "run_id": "split_girlwalk",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-hellwarrior/split_experiments_results.json",
+      "run_id": "split_hellwarrior",
+      "sha256": "e87cde0b768c8c0c19249862250559fee9897c663d55d312ae49b8ca5842fd88"
+    },
+    {
+      "result_file": "exp-split-hook/split_experiments_results.json",
+      "run_id": "split_hook",
+      "sha256": "91750213ec81355544d6eb9953f391526b7577e99c5711b57d9130f78fd5e5fa"
+    },
+    {
+      "result_file": "exp-split-horse/split_experiments_results.json",
+      "run_id": "split_horse",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-jumpingjacks/split_experiments_results.json",
+      "run_id": "split_jumpingjacks",
+      "sha256": "956b920c9235c901921262fd15ee0781526c47fc41cddbd96aaeec5818aa92cf"
+    },
+    {
+      "result_file": "exp-split-lego/split_experiments_results.json",
+      "run_id": "split_lego",
+      "sha256": "1173c87b696cc49b1ed2c577d46394438663fcd3d7014298c861a6c6f4166f03"
+    },
+    {
+      "result_file": "exp-split-mutant/split_experiments_results.json",
+      "run_id": "split_mutant",
+      "sha256": "b1d6c0c864a3074f231c2d8f1662c452fad4059888669dff5eeffc17e9fbdb5a"
+    },
+    {
+      "result_file": "exp-split-standup/split_experiments_results.json",
+      "run_id": "split_standup",
+      "sha256": "05666b07927d0cb942bf7d36a3f8a97ecbe1e12f22842fe546152a7f470afbcb"
+    },
+    {
+      "result_file": "exp-split-torus2sphere/split_experiments_results.json",
+      "run_id": "split_torus2sphere",
+      "sha256": "bb48dcf6ce4e8c808517fa285e07d7c8d74b7591e4393feb355b7809c866813f"
+    },
+    {
+      "result_file": "exp-split-trex/split_experiments_results.json",
+      "run_id": "split_trex",
+      "sha256": "2a86136f5b9440de020d72a00f8f59823eaed464f3b9a0e06ba7119e01dbf355"
+    }
+  ],
+  "repository": {
+    "revision": "16a7093",
+    "url": "https://github.com/Net-Maker/Deform-2DGS"
+  },
+  "reproduction_id": "deform2dgs_observation_split",
+  "runs": {
+    "lbs_beagle": {
+      "psnr_by_observation_fraction": {
+        "10%": 17.658069610595703,
+        "100%": 38.829917907714844,
+        "20%": 20.22176170349121,
+        "30%": 22.77396011352539,
+        "40%": 25.544921875,
+        "50%": 28.38228988647461,
+        "60%": 31.11566734313965,
+        "70%": 33.414085388183594,
+        "80%": 35.69219207763672,
+        "90%": 37.825355529785156
+      },
+      "scene": "beagle",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "lbs_bird": {
+      "psnr_by_observation_fraction": {
+        "10%": 19.74663734436035,
+        "100%": 30.710174560546875,
+        "20%": 21.015111923217773,
+        "30%": 22.461830139160156,
+        "40%": 23.72063446044922,
+        "50%": 24.592182159423828,
+        "60%": 25.985231399536133,
+        "70%": 27.472963333129883,
+        "80%": 28.712604522705078,
+        "90%": 28.60491943359375
+      },
+      "scene": "bird",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "lbs_duck": {
+      "psnr_by_observation_fraction": {
+        "10%": 22.04094123840332,
+        "100%": 37.94468307495117,
+        "20%": 23.063594818115234,
+        "30%": 24.51468276977539,
+        "40%": 26.36678123474121,
+        "50%": 28.639705657958984,
+        "60%": 30.77022933959961,
+        "70%": 32.50315856933594,
+        "80%": 34.17451095581055,
+        "90%": 35.189422607421875
+      },
+      "scene": "duck",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "lbs_girlwalk": {
+      "psnr_by_observation_fraction": {
+        "10%": 23.135055541992188,
+        "100%": 38.13492965698242,
+        "20%": 25.4945068359375,
+        "30%": 27.447914123535156,
+        "40%": 29.13295555114746,
+        "50%": 31.373592376708984,
+        "60%": 32.783817291259766,
+        "70%": 33.94721984863281,
+        "80%": 35.30277633666992,
+        "90%": 36.98985290527344
+      },
+      "scene": "girlwalk",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "lbs_horse": {
+      "psnr_by_observation_fraction": {
+        "10%": 22.313617706298828,
+        "100%": 34.29411697387695,
+        "20%": 23.990890502929688,
+        "30%": 25.581912994384766,
+        "40%": 27.27388572692871,
+        "50%": 29.14183235168457,
+        "60%": 30.130842208862305,
+        "70%": 31.82642936706543,
+        "80%": 32.414276123046875,
+        "90%": 33.47830581665039
+      },
+      "scene": "horse",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "lbs_torus2sphere": {
+      "psnr_by_observation_fraction": {
+        "10%": 18.59854507446289,
+        "100%": 31.244108200073242,
+        "20%": 19.611196517944336,
+        "30%": 20.83266258239746,
+        "40%": 22.33596420288086,
+        "50%": 23.787757873535156,
+        "60%": 25.077531814575195,
+        "70%": 26.391990661621094,
+        "80%": 28.233930587768555,
+        "90%": 29.98484230041504
+      },
+      "scene": "torus2sphere",
+      "status": "complete",
+      "variant": "lbs"
+    },
+    "split_beagle": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "beagle",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_bird": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "bird",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_bouncingballs": {
+      "psnr_by_observation_fraction": {
+        "10%": 19.54964256286621,
+        "100%": 32.09952163696289,
+        "20%": 21.24755096435547,
+        "30%": 24.56159782409668,
+        "40%": 27.00485610961914,
+        "50%": 28.227813720703125,
+        "60%": 28.723127365112305,
+        "70%": 30.284521102905273,
+        "80%": 31.729459762573242,
+        "90%": 31.768335342407227
+      },
+      "scene": "bouncingballs",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_duck": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "duck",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_girlwalk": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "girlwalk",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_hellwarrior": {
+      "psnr_by_observation_fraction": {
+        "10%": 28.462072372436523,
+        "100%": 40.01070022583008,
+        "20%": 29.442138671875,
+        "30%": 31.25577163696289,
+        "40%": 32.592018127441406,
+        "50%": 33.767513275146484,
+        "60%": 34.7925910949707,
+        "70%": 35.95937728881836,
+        "80%": 37.54989242553711,
+        "90%": 38.94673538208008
+      },
+      "scene": "hellwarrior",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_hook": {
+      "psnr_by_observation_fraction": {
+        "10%": 19.99198341369629,
+        "100%": 36.24332809448242,
+        "20%": 21.975156784057617,
+        "30%": 24.216474533081055,
+        "40%": 26.587636947631836,
+        "50%": 28.358295440673828,
+        "60%": 29.340499877929688,
+        "70%": 31.21592140197754,
+        "80%": 33.06558609008789,
+        "90%": 35.11051559448242
+      },
+      "scene": "hook",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_horse": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "horse",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_jumpingjacks": {
+      "psnr_by_observation_fraction": {
+        "10%": 20.425939559936523,
+        "100%": 36.737892150878906,
+        "20%": 22.30440330505371,
+        "30%": 24.46256446838379,
+        "40%": 27.389129638671875,
+        "50%": 29.66571044921875,
+        "60%": 30.548309326171875,
+        "70%": 32.187950134277344,
+        "80%": 34.08054733276367,
+        "90%": 35.621212005615234
+      },
+      "scene": "jumpingjacks",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_lego": {
+      "psnr_by_observation_fraction": {
+        "10%": 17.558698654174805,
+        "100%": 24.97470474243164,
+        "20%": 20.968626022338867,
+        "30%": 22.120817184448242,
+        "40%": 22.279300689697266,
+        "50%": 22.68226432800293,
+        "60%": 23.542194366455078,
+        "70%": 24.01539421081543,
+        "80%": 24.33881187438965,
+        "90%": 24.70979881286621
+      },
+      "scene": "lego",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_mutant": {
+      "psnr_by_observation_fraction": {
+        "10%": 23.95819664001465,
+        "100%": 40.566341400146484,
+        "20%": 26.201162338256836,
+        "30%": 27.76374626159668,
+        "40%": 29.631885528564453,
+        "50%": 31.899045944213867,
+        "60%": 33.968833923339844,
+        "70%": 35.6505241394043,
+        "80%": 37.468257904052734,
+        "90%": 38.94749069213867
+      },
+      "scene": "mutant",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_standup": {
+      "psnr_by_observation_fraction": {
+        "10%": 22.112781524658203,
+        "100%": 42.89933395385742,
+        "20%": 24.6495418548584,
+        "30%": 27.05875015258789,
+        "40%": 29.9011173248291,
+        "50%": 33.005096435546875,
+        "60%": 35.14862060546875,
+        "70%": 37.360042572021484,
+        "80%": 39.490352630615234,
+        "90%": 41.48057174682617
+      },
+      "scene": "standup",
+      "status": "complete",
+      "variant": "split"
+    },
+    "split_torus2sphere": {
+      "psnr_by_observation_fraction": {
+        "10%": null,
+        "100%": null,
+        "20%": null,
+        "30%": null,
+        "40%": null,
+        "50%": null,
+        "60%": null,
+        "70%": null,
+        "80%": null,
+        "90%": null
+      },
+      "scene": "torus2sphere",
+      "status": "incomplete",
+      "variant": "split"
+    },
+    "split_trex": {
+      "psnr_by_observation_fraction": {
+        "10%": 21.587060928344727,
+        "100%": 32.89874267578125,
+        "20%": 22.224733352661133,
+        "30%": 24.261924743652344,
+        "40%": 25.42582130432129,
+        "50%": 29.103866577148438,
+        "60%": 29.89402198791504,
+        "70%": 29.07672119140625,
+        "80%": 32.79720687866211,
+        "90%": 33.708316802978516
+      },
+      "scene": "trex",
+      "status": "complete",
+      "variant": "split"
+    }
+  },
+  "schema_version": 1
+}

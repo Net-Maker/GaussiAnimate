@@ -1,0 +1,194 @@
+schema_version: 2
+experiment:
+  id: arap_ssdr_ablation
+  target_id: arap_ssdr_ablation
+  title: ARAP and SSDR ablation
+  paper_target: Fig. 8 / Sec4.arap_ablation
+  seed: 42
+output_dir: ../runs/arap_ssdr_ablation
+datasets:
+  - id: synthetic
+    label: DG-Mesh girlwalk
+    cases:
+      - id: girlwalk
+methods:
+  - id: arap_ssdr
+    label: ARAP + SSDR
+    mode: external
+    stages:
+      - id: train
+        type: command
+        resources: {gpu: true}
+        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - train_gui.py
+          - --source_path
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - --model_path
+          - "{run_dir}/model"
+          - --deform_type
+          - node
+          - --node_num
+          - 512
+          - --is_blender
+          - --eval
+          - --gt_alpha_mask_as_scene_mask
+          - --local_frame
+          - --resolution
+          - 2
+          - --iterations
+          - 40000
+          - --iterations_node_rendering
+          - 10000
+          - --use_isotropic_gs
+        inputs:
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+        outputs: ["{run_dir}/model_node/cfg_args"]
+      - id: extract
+        type: command
+        cwd: ${GA_RIGGS_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_RIGGS_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - my_own_pipe.py
+          - --model_path
+          - "{run_dir}/model_node"
+          - --until
+          - refine
+          - --num_bones
+          - 50
+          - --joint_threshold
+          - 0.3
+          - --export_all_pointclouds
+        inputs: ["{run_dir}/model_node/cfg_args"]
+        outputs:
+          - "{run_dir}/model_node/ssdr_results_bones50.npz"
+          - "{run_dir}/model_node/inner_skeleton_refined/inner_skeleton.npz"
+      - id: collect
+        type: collect_npz
+        source: "{run_dir}/model_node/ssdr_results_bones50.npz"
+        selectors:
+          ssdr_rmse: rmse
+          outer_bones: num_bones
+        output: "{run_dir}/ablation_metrics.json"
+        inputs: ["{run_dir}/model_node/ssdr_results_bones50.npz"]
+        outputs: ["{run_dir}/ablation_metrics.json"]
+  - id: no_arap_ssdr
+    label: no ARAP + SSDR
+    mode: external
+    stages:
+      - id: train
+        type: command
+        resources: {gpu: true}
+        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - train_gui.py
+          - --source_path
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - --model_path
+          - "{run_dir}/model"
+          - --deform_type
+          - node
+          - --node_num
+          - 512
+          - --is_blender
+          - --eval
+          - --gt_alpha_mask_as_scene_mask
+          - --local_frame
+          - --resolution
+          - 2
+          - --iterations
+          - 40000
+          - --iterations_node_rendering
+          - 10000
+          - --use_isotropic_gs
+          - --no_arap_loss
+        inputs:
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+        outputs: ["{run_dir}/model_node/cfg_args"]
+      - id: extract
+        type: command
+        cwd: ${GA_RIGGS_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_RIGGS_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - my_own_pipe.py
+          - --model_path
+          - "{run_dir}/model_node"
+          - --until
+          - refine
+          - --num_bones
+          - 50
+          - --joint_threshold
+          - 0.3
+          - --export_all_pointclouds
+        inputs: ["{run_dir}/model_node/cfg_args"]
+        outputs:
+          - "{run_dir}/model_node/ssdr_results_bones50.npz"
+          - "{run_dir}/model_node/inner_skeleton_refined/inner_skeleton.npz"
+      - id: collect
+        type: collect_npz
+        source: "{run_dir}/model_node/ssdr_results_bones50.npz"
+        selectors:
+          ssdr_rmse: rmse
+          outer_bones: num_bones
+        output: "{run_dir}/ablation_metrics.json"
+        inputs: ["{run_dir}/model_node/ssdr_results_bones50.npz"]
+        outputs: ["{run_dir}/ablation_metrics.json"]
+  - id: arap_no_ssdr
+    label: ARAP + raw control nodes
+    mode: external
+    stages:
+      - id: train
+        type: command
+        resources: {gpu: true}
+        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - train_gui.py
+          - --source_path
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - --model_path
+          - "{run_dir}/model"
+          - --deform_type
+          - node
+          - --node_num
+          - 512
+          - --is_blender
+          - --eval
+          - --gt_alpha_mask_as_scene_mask
+          - --local_frame
+          - --resolution
+          - 2
+          - --iterations
+          - 40000
+          - --iterations_node_rendering
+          - 10000
+          - --use_isotropic_gs
+        inputs:
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+        outputs:
+          - "{run_dir}/model_node/deform/iteration_40000/deform.pth"
+          - "{run_dir}/model_node/point_cloud/iteration_40000/point_cloud.ply"
+      - id: export_raw_node_weights
+        type: command
+        cwd: ${GA_PUBLIC_ROOT:-.}
+        command:
+          - ${GA_RIGGS_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - -m
+          - experiments.monocular_gaussian.raw_node_skinning
+          - --point-cloud
+          - "{run_dir}/model_node/point_cloud/iteration_40000/point_cloud.ply"
+          - --deform-checkpoint
+          - "{run_dir}/model_node/deform/iteration_40000/deform.pth"
+          - --output-ply
+          - "{run_dir}/raw_node_skinning.ply"
+          - --output-npz
+          - "{run_dir}/raw_node_skinning.npz"
+        inputs:
+          - "{run_dir}/model_node/point_cloud/iteration_40000/point_cloud.ply"
+          - "{run_dir}/model_node/deform/iteration_40000/deform.pth"
+        outputs:
+          - "{run_dir}/raw_node_skinning.ply"
+          - "{run_dir}/raw_node_skinning.npz"
+          - "{run_dir}/raw_node_skinning.json"

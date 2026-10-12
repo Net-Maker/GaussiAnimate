@@ -1,0 +1,43 @@
+schema_version: 2
+experiment:
+  id: multiview_novel_pose
+  target_id: human_novel_pose
+  title: Novel-pose rendering on clothed humans
+  paper_target: Table 3 / unseen-pose clothing rendering
+  seed: 42
+output_dir: ${GA_EXPERIMENT_RUNS_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1/runs}/multiview_novel_pose
+datasets:
+  - id: dna_rendering
+    label: DNA-Rendering
+    frames: 150
+    protocol: original resolution, contiguous 80/20 split, four evaluation cameras
+    cases:
+      - dna_0012_11
+      - dna_0013_01
+      - dna_0013_03
+      - dna_0013_09
+      - dna_0013_11
+      - dna_0019_08
+      - dna_0021_03
+      - dna_0023_06
+  - id: actorshq
+    label: ActorsHQ
+    frames: 300
+    protocol: 300 highest-motion frames by mesh bbox variation, 4x downsample, contiguous 80/20 split
+    paper_note: Table averages use 10 sequences although the prose describes 8 subjects.
+    cases:
+      - actorshq_actor01_seq1
+      - actorshq_actor01_seq2
+      - actorshq_actor02_seq1
+      - actorshq_actor02_seq2
+      - actorshq_actor04_seq2
+      - actorshq_actor05_seq1
+      - actorshq_actor06_seq1
+      - actorshq_actor06_seq2
+      - actorshq_actor07_seq1
+      - actorshq_actor08_seq1
+method_files:
+  - methods/d3dgs_gt.yaml
+  - methods/smpl_lbs.yaml
+  - methods/smpl_bob.yaml
+  - methods/smpl_partmm.yaml

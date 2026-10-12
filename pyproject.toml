@@ -1,0 +1,107 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gaussianimate"
+version = "0.1.0"
+description = "Skelebone extraction and partwise motion matching for dynamic 3D assets"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8,<3.12"
+dependencies = [
+  "numpy>=1.22,<1.26",
+  "PyYAML>=6.0",
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.optional-dependencies]
+visualization = [
+  "open3d>=0.19,<0.20",
+  "Pillow>=9.5",
+  "matplotlib>=3.7",
+]
+ssdr = ["scipy>=1.8,<1.16"]
+geometry = [
+  "open3d>=0.19,<0.20",
+  "matplotlib>=3.7",
+  "plyfile>=1.0",
+  "scipy>=1.8,<1.16",
+  "libigl==2.5.1",
+]
+gui = ["dearpygui>=2.0,<3"]
+evaluation = [
+  "Pillow>=9.5",
+  "scikit-image>=0.21",
+  "lpips>=0.1.4",
+]
+research = [
+  "torch>=2.0,<2.6",
+  "torchvision>=0.15,<0.21",
+  "smplx>=0.1.28,<0.2",
+  "h5py>=3.8,<4",
+  "trimesh>=3.23,<5",
+  "tensorboard>=2.12,<3",
+]
+dev = ["pytest>=7,<9", "build>=1,<2"]
+
+[project.scripts]
+gaussianimate = "skelebone.__main__:main"
+gaussianimate-animate = "partmm.__main__:main"
+gaussianimate-edit = "partmm.gui:main"
+gaussianimate-experiment = "experiments.run:main"
+gaussianimate-paper = "experiments.paper:main"
+gaussianimate-paper-audit = "experiments.audit:main"
+gaussianimate-sync-reproductions = "experiments.reproductions.sync:main"
+gaussianimate-monocular-resources = "experiments.monocular_gaussian.resources:main"
+gaussianimate-progressive-evidence = "experiments.monocular_gaussian.progressive_evidence:main"
+gaussianimate-arap-evidence = "experiments.monocular_gaussian.arap_evidence:main"
+gaussianimate-vto-evidence = "experiments.mesh.vto_evidence:main"
+gaussianimate-dt4d-evidence = "experiments.mesh.dt4d_evidence:main"
+gaussianimate-runtime-evidence = "experiments.mesh.runtime_evidence:main"
+gaussianimate-multiview-resources = "experiments.multiview_gaussian.resources:main"
+gaussianimate-multiview-pipeline = "experiments.multiview_gaussian.pipeline:main"
+gaussianimate-multiview-evidence = "experiments.multiview_gaussian.historical_evidence:main"
+
+[tool.setuptools]
+include-package-data = false
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+packages = [
+  "partmm",
+  "partmm.examples",
+  "skelebone",
+  "skelebone.examples",
+  "skelebone.extraction",
+  "experiments",
+  "experiments.engine",
+  "experiments.methods",
+  "experiments.monocular_gaussian",
+  "experiments.multiview_gaussian",
+  "experiments.mesh",
+  "experiments.reproductions",
+  "experiments.reproductions.dressrecon_bob",
+]
+
+[tool.setuptools.package-data]
+partmm = ["README.md", "examples/*.png", "examples/*.gif"]
+skelebone = ["examples/*.png", "examples/*.gif"]
+# Explicit per-tree allowlist: local run outputs (experiments/runs) and
+# diagnostics artifacts must never match a packaging pattern.
+experiments = [
+  "README.md",
+  "catalog.yaml",
+  "mesh/*.yaml",
+  "monocular_gaussian/*.yaml",
+  "multiview_gaussian/*.yaml",
+  "multiview_gaussian/methods/*.yaml",
+  "reproductions/*.yaml",
+  "reproductions/results/*.json",
+  "reproductions/dressrecon_bob/LICENSE",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

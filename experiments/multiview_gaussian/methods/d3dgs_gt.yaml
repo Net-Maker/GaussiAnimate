@@ -1,0 +1,51 @@
+schema_version: 1
+kind: experiment_methods
+methods:
+  - id: d3dgs_gt
+    label: D3DGS (GT)
+    mode: external
+    stages:
+      - id: evaluate
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          OMP_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          NUMEXPR_NUM_THREADS: 1
+          PYTHONUNBUFFERED: 1
+          PYTHONFAULTHANDLER: 1
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.oracle_eval
+          - --gpu
+          - 0
+          - --sequence
+          - "{case.id}"
+          - --output
+          - "{run_dir}/evaluation/{case.id}.json"
+          - --d3dgs-root
+          - ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+          - --release-root
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs
+          - --dna-results-dir
+          - ${GA_D3DGS_DNA_RESULTS:-~/research/GA/Dynamic3DGaussians/server_output/dna_exp_1x}
+          - --actorshq-results-dir
+          - ${GA_D3DGS_ACTORSHQ_RESULTS:-~/research/GA/Dynamic3DGaussians/output/actorshq_exp}
+          - --data-dir
+          - ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+        inputs:
+          - ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+        outputs:
+          - "{run_dir}/evaluation/{case.id}.json"
+      - id: collect
+        type: collect_json
+        source: "{run_dir}/evaluation/{case.id}.json"
+        selectors:
+          psnr: oracle.psnr
+          ssim: oracle.ssim
+          lpips: oracle.lpips
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{run_dir}/evaluation/{case.id}.json"]
+        outputs: ["{run_dir}/image_metrics.json"]

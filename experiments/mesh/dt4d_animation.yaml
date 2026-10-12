@@ -1,0 +1,78 @@
+schema_version: 2
+experiment:
+  id: dt4d_animation
+  target_id: d4d_animal_animation
+  title: DeformingThings4D unseen-pose animal animation
+  paper_target: Table 4 / D4D animal mean vertex error
+  seed: 42
+output_dir: ../runs/dt4d_animation
+datasets:
+  - id: deformingthings4d
+    label: DeformingThings4D
+    source_categories: 57
+    paper_protocol: select about 200 highest-motion frames; five source sequences and one held-out sequence; 80/20 frame split
+    recovered_protocol: 26-instance motion-prefix leave-one-out benchmark with similarity and temporal fallbacks
+    evaluation_note: The recovered artifact is a historical protocol proxy, not an implementation of the paper's stated uniform split.
+    metric: mean per-frame per-vertex Euclidean distance in millimeters
+    metric_note: The paper labels this value RMSE, but the recovered evaluator averages Euclidean vertex distances without a final root-mean-square reduction.
+    cases:
+      - id: all_eligible_animals
+        expected_instances: 26
+        summary_sha256: 2d6017baba956f3bcc191453409fa8bafdfa238fea7529082fbc8da040daafa5
+methods:
+  - id: robust_lbs
+    label: Historical distance-weighted LBS proxy
+    protocol_note: The recovered benchmark uses inverse-distance-to-bone weights with power four; it does not implement the paper-stated robust BBW transfer.
+    mode: external
+    stages:
+      - &dt4d_suite
+        id: evaluate
+        type: command
+        resources: {gpu: true}
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        command:
+          - ${GA_DT4D_PYTHON:-~/anaconda3/envs/py38/bin/python}
+          - -m
+          - experiments.mesh.dt4d_suite
+          - --method
+          - "{method.id}"
+          - --output
+          - "{run_dir}/geometry_metrics.json"
+          - --experiment-root
+          - ${GA_DT4D_EXPERIMENT_ROOT:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment}
+          - --python
+          - ${GA_DT4D_PYTHON:-~/anaconda3/envs/py38/bin/python}
+          - --summary
+          - ${GA_DT4D_BENCHMARK_SUMMARY:-~/research/data/DeformingThings4D/skeleton2ssdr_experiment/benchmark_results/benchmark_results.json}
+          - --target-frames
+          - 200
+          - --training-steps
+          - 10000
+          - --expected-instances
+          - "{case.expected_instances}"
+          - --expected-summary-sha256
+          - "{case.summary_sha256}"
+        inputs:
+          - ${GA_DT4D_ROOT:-~/research/data/DeformingThings4D}
+        outputs: ["{run_dir}/geometry_metrics.json"]
+  - id: mlp
+    label: Ours + MLP
+    mode: external
+    stages:
+      - *dt4d_suite
+  - id: gru
+    label: Ours + GRU
+    mode: external
+    stages:
+      - *dt4d_suite
+  - id: fullmm
+    label: FullMM
+    mode: external
+    stages:
+      - *dt4d_suite
+  - id: partmm
+    label: Historical PartMM-labelled proxy
+    protocol_note: The recovered benchmark performs per-frame nearest-neighbor retrieval on local rotations and does not implement the stated patch size 7, k=7, five pyramid levels, or part-alignment protocol.
+    mode: external
+    stages:
+      - *dt4d_suite

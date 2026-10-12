@@ -1,0 +1,77 @@
+schema_version: 2
+experiment:
+  id: reproduction_human_novel_pose
+  target_id: reproduction_human_novel_pose
+  title: Local human novel-pose reproductions
+  paper_target: D3DGS, DressRecon BoB, robust LBS, and SSDR diagnostic evidence
+  seed: 42
+output_dir: ../runs/reproduction_human_novel_pose
+datasets:
+  - id: dna_rendering
+    label: DNA-Rendering
+    cases:
+      - dna_0012_11
+      - dna_0013_01
+      - dna_0013_03
+      - dna_0013_09
+      - dna_0013_11
+      - dna_0019_08
+      - dna_0021_03
+      - dna_0023_06
+  - id: actorshq
+    label: ActorsHQ
+    cases:
+      - actorshq_actor01_seq1
+      - actorshq_actor01_seq2
+      - actorshq_actor02_seq1
+      - actorshq_actor02_seq2
+      - actorshq_actor04_seq2
+      - actorshq_actor05_seq1
+      - actorshq_actor06_seq1
+      - actorshq_actor06_seq2
+      - actorshq_actor07_seq1
+      - actorshq_actor08_seq1
+methods:
+  - id: d3dgs_gt
+    label: D3DGS (GT)
+    mode: artifact
+    stages:
+      - &collect_render
+        id: collect
+        type: collect_json
+        source: "{config_dir}/results/human_novel_pose.json"
+        selectors:
+          psnr: "per_sequence.{case.id}.methods.{method.id}.psnr"
+          ssim: "per_sequence.{case.id}.methods.{method.id}.ssim"
+          lpips: "per_sequence.{case.id}.methods.{method.id}.lpips"
+          fg_psnr: "per_sequence.{case.id}.methods.{method.id}.fg_psnr"
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{config_dir}/results/human_novel_pose.json"]
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: smpl_lbs
+    label: SMPL + Robust LBS
+    mode: artifact
+    stages:
+      - <<: *collect_render
+        selectors:
+          psnr: "per_sequence.{case.id}.methods.{method.id}.psnr"
+          ssim: "per_sequence.{case.id}.methods.{method.id}.ssim"
+          lpips: "per_sequence.{case.id}.methods.{method.id}.lpips"
+          fg_psnr: "per_sequence.{case.id}.methods.{method.id}.fg_psnr"
+          vertex_rmse_mm: "per_sequence.{case.id}.methods.{method.id}.vertex_rmse_mm"
+  - id: smpl_bob
+    label: SMPL + DressRecon BoB
+    mode: artifact
+    stages:
+      - *collect_render
+  - id: ssdr_reconstruction
+    label: SSDR reconstruction diagnostic (not PartMM)
+    mode: artifact
+    stages:
+      - <<: *collect_render
+        selectors:
+          psnr: "per_sequence.{case.id}.methods.{method.id}.psnr"
+          ssim: "per_sequence.{case.id}.methods.{method.id}.ssim"
+          lpips: "per_sequence.{case.id}.methods.{method.id}.lpips"
+          fg_psnr: "per_sequence.{case.id}.methods.{method.id}.fg_psnr"
+          vertex_rmse_mm: "per_sequence.{case.id}.methods.{method.id}.vertex_rmse_mm"

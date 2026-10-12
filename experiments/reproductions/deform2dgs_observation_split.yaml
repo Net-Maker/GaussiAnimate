@@ -1,0 +1,42 @@
+schema_version: 2
+experiment:
+  id: reproduction_deform2dgs_observation_split
+  target_id: reproduction_deform2dgs_observation_split
+  title: Deform-2DGS observation-fraction reproduction
+  paper_target: Local low-observation reconstruction study
+  seed: 42
+output_dir: ../runs/reproduction_deform2dgs_observation_split
+datasets:
+  - id: dnerf_dgmesh
+    label: D-NeRF and DG-Mesh
+    protocol: Mean PSNR over complete local runs at each observation fraction.
+    cases: [aggregate]
+methods:
+  - &split_method
+    id: lbs
+    label: Deform-2DGS LBS scenes
+    mode: artifact
+    stages:
+      - &split_collect
+        id: collect
+        type: collect_json
+        source: "{config_dir}/results/deform2dgs_observation_split.json"
+        selectors:
+          complete_runs: "by_variant.{method.id}.complete_runs"
+          incomplete_runs: "by_variant.{method.id}.incomplete_runs"
+          psnr_10: "by_variant.{method.id}.metrics_on_complete_runs.psnr_10"
+          psnr_20: "by_variant.{method.id}.metrics_on_complete_runs.psnr_20"
+          psnr_30: "by_variant.{method.id}.metrics_on_complete_runs.psnr_30"
+          psnr_40: "by_variant.{method.id}.metrics_on_complete_runs.psnr_40"
+          psnr_50: "by_variant.{method.id}.metrics_on_complete_runs.psnr_50"
+          psnr_60: "by_variant.{method.id}.metrics_on_complete_runs.psnr_60"
+          psnr_70: "by_variant.{method.id}.metrics_on_complete_runs.psnr_70"
+          psnr_80: "by_variant.{method.id}.metrics_on_complete_runs.psnr_80"
+          psnr_90: "by_variant.{method.id}.metrics_on_complete_runs.psnr_90"
+          psnr_100: "by_variant.{method.id}.metrics_on_complete_runs.psnr_100"
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{config_dir}/results/deform2dgs_observation_split.json"]
+        outputs: ["{run_dir}/image_metrics.json"]
+  - <<: *split_method
+    id: split
+    label: Deform-2DGS split scenes

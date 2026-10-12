@@ -1,0 +1,56 @@
+schema_version: 1
+kind: qualitative_figure
+figure:
+  id: vto_main_figure
+  paper_target: Main paper qualitative VTO comparison (fig:vto_comp)
+  source_policy: historical_or_explicit_external
+methods:
+  - {id: lbs, label: LBS}
+  - {id: gru, label: GRU}
+  - {id: mlp, label: MLP}
+  - {id: fullmm, label: FullMM}
+  - {id: partmm, label: PartMM (Ours)}
+  - {id: gt, label: GT}
+rows:
+  - {id: mesh, label: Mesh}
+  - {id: overlap, label: GT Overlap}
+  - {id: error, label: Error (0-5 mm)}
+layout:
+  method_order: [lbs, gru, mlp, fullmm, partmm, gt]
+  row_order: [mesh, overlap, error]
+  background: white
+  cell_size: [360, 270]
+  padding: 24
+  gap: 10
+  header_height: 52
+  row_label_width: 72
+  row_label_orientation: vertical
+panels:
+  mesh:
+    lbs: ${GA_VTO_MAIN_LBS_ROOT}/LBS_uniform.png
+    gru: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/GRU_uniform.png
+    mlp: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/MLP_uniform.png
+    fullmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/FullMM_uniform.png
+    partmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/PartMM_uniform.png
+    gt: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/GT_uniform.png
+  overlap:
+    lbs: ${GA_VTO_MAIN_LBS_ROOT}/LBS_overlap.png
+    gru: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/GRU_overlap.png
+    mlp: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/MLP_overlap.png
+    fullmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/FullMM_overlap.png
+    partmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/PartMM_overlap.png
+    gt: null
+  error:
+    lbs: ${GA_VTO_MAIN_LBS_ROOT}/LBS_error.png
+    gru: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/GRU_error.png
+    mlp: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/MLP_error.png
+    fullmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/FullMM_error.png
+    partmm: ${GA_VTO_MAIN_PANEL_ROOT:-~/research/GA/hood/output/hood_video_tshirt_shape00_91_33/individual/0003}/PartMM_error.png
+    gt: null
+output:
+  image: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/vto_main.png
+  provenance: ${GA_QUALITATIVE_OUTPUT_ROOT:-~/research/outputs/GaussiAnimate/figures}/vto_main.provenance.json
+reference:
+  path: ${GA_PAPER_ROOT:-~/research/code/GA_arxiv}/PDFs/vto_comparison2.pdf
+  role: comparison only; never used as a result panel
+  blocker_note: Original LBS mesh, overlap, and error panels were not recovered.

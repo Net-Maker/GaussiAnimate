@@ -1,0 +1,54 @@
+schema_version: 2
+experiment:
+  id: reproduction_cross_method_skeletonization
+  target_id: reproduction_cross_method_skeletonization
+  title: Cross-method skeletonization compatibility
+  paper_target: Local reproduction study across dynamic reconstruction papers
+  seed: 42
+output_dir: ../runs/reproduction_cross_method_skeletonization
+datasets:
+  - id: local_reproductions
+    label: D-NeRF and DG-Mesh scenes
+    protocol: Aggregate only successful runs; retain timeout and partial counts.
+    cases: [aggregate]
+methods:
+  - &cross_method
+    id: dgmesh
+    label: DG-Mesh
+    mode: artifact
+    stages:
+      - &cross_collect
+        id: collect
+        type: collect_json
+        source: "{config_dir}/results/cross_method_skeletonization.json"
+        selectors:
+          successful_runs: "by_method.{method.id}.successful_runs"
+          rmse_x1000: "by_method.{method.id}.metrics_on_successful_runs.rmse_x1000"
+          joints: "by_method.{method.id}.metrics_on_successful_runs.joints"
+          outer_bones: "by_method.{method.id}.metrics_on_successful_runs.outer_bones"
+          joint_accel_x1000: "by_method.{method.id}.metrics_on_successful_runs.joint_accel_x1000"
+          outer_accel_x1000: "by_method.{method.id}.metrics_on_successful_runs.outer_accel_x1000"
+        output: "{run_dir}/geometry_metrics.json"
+        inputs: ["{config_dir}/results/cross_method_skeletonization.json"]
+        outputs: ["{run_dir}/geometry_metrics.json"]
+  - <<: *cross_method
+    id: gaussiananimator
+    label: GaussianAnimator
+  - <<: *cross_method
+    id: deform2dgs
+    label: Deform-2DGS
+  - <<: *cross_method
+    id: deformable3dgs
+    label: Deformable 3D Gaussians
+  - <<: *cross_method
+    id: dynamic2dgs
+    label: Dynamic 2D Gaussians
+  - <<: *cross_method
+    id: scgs
+    label: SC-GS
+  - <<: *cross_method
+    id: riggs_stage1
+    label: RigGS stage 1
+  - <<: *cross_method
+    id: riggs_final_plyseq
+    label: RigGS final point sequence

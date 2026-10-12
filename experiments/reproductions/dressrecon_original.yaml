@@ -1,0 +1,58 @@
+schema_version: 2
+experiment:
+  id: reproduction_dressrecon_original
+  target_id: reproduction_dressrecon_original
+  title: DressRecon local reproduction
+  paper_target: Local reproduction / DressRecon DNA evaluation
+  seed: 42
+output_dir: ../runs/reproduction_dressrecon_original
+datasets:
+  - id: dna_rendering
+    label: DNA-Rendering
+    protocol: Local DressRecon test split; 159 evaluated frames over 14 sequences.
+    cases:
+      - dna_0008_01
+      - dna_0047_01
+      - dna_0047_12
+      - dna_0102_02
+      - dna_0113_06
+      - dna_0121_02
+      - dna_0123_02
+      - dna_0128_04
+      - dna_0133_07
+      - dna_0152_01
+      - dna_0166_04
+      - dna_0188_02
+      - dna_0206_04
+      - dna_0239_01
+methods:
+  - id: dressrecon
+    label: DressRecon
+    mode: artifact
+    stages:
+      - id: collect
+        type: collect_json
+        source: "{config_dir}/results/dressrecon_original.json"
+        selectors:
+          psnr: "per_sequence.{case.id}.methods.dressrecon.psnr"
+          ssim: "per_sequence.{case.id}.methods.dressrecon.ssim"
+          lpips: "per_sequence.{case.id}.methods.dressrecon.lpips"
+          evaluated_frames: "per_sequence.{case.id}.num_evaluated"
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{config_dir}/results/dressrecon_original.json"]
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: dressrecon_motion_matching
+    label: DressRecon + Motion Matching
+    mode: artifact
+    stages:
+      - id: collect
+        type: collect_json
+        source: "{config_dir}/results/dressrecon_original.json"
+        selectors:
+          psnr: "per_sequence.{case.id}.methods.dressrecon_motion_matching.psnr"
+          ssim: "per_sequence.{case.id}.methods.dressrecon_motion_matching.ssim"
+          lpips: "per_sequence.{case.id}.methods.dressrecon_motion_matching.lpips"
+          evaluated_frames: "per_sequence.{case.id}.num_evaluated"
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{config_dir}/results/dressrecon_original.json"]
+        outputs: ["{run_dir}/image_metrics.json"]

@@ -1,0 +1,94 @@
+schema_version: 2
+experiment:
+  id: multiview_d3dgs_reconstruction
+  target_id: multiview_d3dgs_reconstruction
+  title: D3DGS reconstruction for real clothed humans
+  paper_target: Table 3 / shared D3DGS reconstruction
+  seed: 42
+output_dir: ${GA_EXPERIMENT_RUNS_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1/runs}/multiview_d3dgs_reconstruction
+datasets:
+  - id: dna_rendering
+    label: DNA-Rendering (8 sequences, original resolution)
+    scale_mode: anisotropic
+    color_bound_mode: none
+    protocol_note: Recovered Table 3 D3DGS checkpoints use anisotropic scales.
+    split:
+      train: 0.8
+      test: 0.2
+      policy: contiguous
+    cases:
+      - {id: dna_0012_11, train_id: dna_0012_11_1x, frames: 150}
+      - {id: dna_0013_01, train_id: dna_0013_01_1x, frames: 150}
+      - {id: dna_0013_03, train_id: dna_0013_03_1x, frames: 150}
+      - {id: dna_0013_09, train_id: dna_0013_09_1x, frames: 150}
+      - {id: dna_0013_11, train_id: dna_0013_11_1x, frames: 150}
+      - {id: dna_0019_08, train_id: dna_0019_08_1x, frames: 150}
+      - {id: dna_0021_03, train_id: dna_0021_03_1x, frames: 150}
+      - {id: dna_0023_06, train_id: dna_0023_06_1x, frames: 150}
+  - id: actorshq
+    label: ActorsHQ (10 table sequences, highest-motion 300 frames, 4x downsample)
+    scale_mode: isotropic
+    color_bound_mode: sigmoid_rgb
+    protocol_note: Recovered ActorsHQ D3DGS checkpoints use isotropic scales. New-protocol training optimizes RGB logits and decodes them with a sigmoid so exported rgb_colors stay within [0, 1].
+    paper_note: The paper prose says 8 subjects; the recovered Table 3 aggregate uses these 10 sequences.
+    selection:
+      frames: 300
+      score: mesh_bbox_variation
+      downsample: 4
+    split:
+      train: 0.8
+      test: 0.2
+      policy: contiguous
+    cases:
+      - {id: actorshq_actor01_seq1, train_id: actorshq_actor01_seq1, frames: 300}
+      - {id: actorshq_actor01_seq2, train_id: actorshq_actor01_seq2, frames: 300}
+      - {id: actorshq_actor02_seq1, train_id: actorshq_actor02_seq1, frames: 300}
+      - {id: actorshq_actor02_seq2, train_id: actorshq_actor02_seq2, frames: 300}
+      - {id: actorshq_actor04_seq2, train_id: actorshq_actor04_seq2, frames: 300}
+      - {id: actorshq_actor05_seq1, train_id: actorshq_actor05_seq1, frames: 300}
+      - {id: actorshq_actor06_seq1, train_id: actorshq_actor06_seq1, frames: 300}
+      - {id: actorshq_actor06_seq2, train_id: actorshq_actor06_seq2, frames: 300}
+      - {id: actorshq_actor07_seq1, train_id: actorshq_actor07_seq1, frames: 300}
+      - {id: actorshq_actor08_seq1, train_id: actorshq_actor08_seq1, frames: 300}
+methods:
+  - id: d3dgs
+    label: Dynamic 3D Gaussians
+    mode: external
+    stages:
+      - id: train
+        type: command
+        resources: {gpu: true}
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.train_d3dgs
+          - --d3dgs-root
+          - ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+          - --train-id
+          - "{case.train_id}"
+          - --resource-id
+          - "{case.id}"
+          - --experiment
+          - paper_dna
+          - --data-dir
+          - ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+          - --output-dir
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}
+          - --frames
+          - "{case.frames}"
+          - --iterations
+          - 10000
+          - --checkpoint-every
+          - 10
+          - --scale-mode
+          - "{dataset.scale_mode}"
+          - --color-bound-mode
+          - "{dataset.color_bound_mode}"
+        inputs:
+          - "${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}/{case.train_id}"
+        outputs:
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/training_provenance.json

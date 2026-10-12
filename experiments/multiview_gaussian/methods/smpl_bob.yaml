@@ -1,0 +1,165 @@
+schema_version: 1
+kind: experiment_methods
+methods:
+  - id: smpl_bob
+    label: SMPL + Bag of Bones
+    mode: external
+    implementation:
+      source: DressRecon
+      revision: 91b3b7935f0d088a50ac94bd8e731559dbfd9dd7
+      license: MIT
+    protocol:
+      id: smpl_bob_release_v1
+      status: auditable_reconstruction_not_paper_exact
+      train_ratio: 0.8
+      num_bones: 25
+      num_iterations: 2000
+      learning_rate: 0.001
+      batch_frames: 8
+      driven_points: all_gaussians
+      opacity_filter: null
+      point_subsampling: null
+      adapter_id: gaussianimate_dressrecon_composed_pose_bob_v2
+      joint_mapping_id: smpl_joints_1_23_to_rootless_links_v1
+      pose_joint_range: [1, 24]
+      pose_dimensions: 69
+      skeleton_links: 23
+      root_joint_id: 0
+      root_pose_dimensions: 3
+      root_handling: separate_excluded_from_rootless_fk
+      root_translation_handling: not_consumed_by_adapter
+      predicted_gaussian_attributes: [means3D]
+      evaluation_attribute_source: target_frame
+      oracle_evaluation_attributes:
+        - rgb_colors
+        - unnorm_rotations
+    stages:
+      - id: export_smpl_motion
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.human_pose
+          - --case
+          - "{case.id}"
+          - --output
+          - "{run_dir}/motion/smpl_motion.npz"
+          - --resources
+          - ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}/experiments/multiview_gaussian/resources.yaml
+          - --smpl-model
+          - ${GA_SMPL_MODEL:-~/research/data/hood_data/aux_data/smpl/SMPL_NEUTRAL.pkl}
+          - --dna-annotations
+          - ${GA_DNA_ANNOTATIONS:-~/research/data/DNA-Rendering/data_used_in_4K4D/annotations}
+          - --dna-reader-root
+          - ${GA_DNA_READER_ROOT:-~/research/data/DNA-Rendering/dna_rendering_sample_code}
+          - --actorshq-smplx
+          - ${GA_ACTORSHQ_SMPLX:-~/research/GA/Dynamic3DGaussians/actorshq_smplx}
+          - --frames
+          - "{dataset.frames}"
+          - --fps
+          - 30
+        outputs:
+          - "{run_dir}/motion/smpl_motion.npz"
+      - id: fit
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${GA_DRESSRECON_ROOT:-~/research/code/dressrecon}:${PYTHONPATH:-}
+          OMP_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          NUMEXPR_NUM_THREADS: 1
+          PYTHONUNBUFFERED: 1
+          PYTHONFAULTHANDLER: 1
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.human_bob
+          - --params
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+          - --motion
+          - "{run_dir}/motion/smpl_motion.npz"
+          - --output-dir
+          - "{run_dir}/bob/{case.id}"
+          - --dressrecon-root
+          - ${GA_DRESSRECON_ROOT:-~/research/code/dressrecon}
+          - --train-ratio
+          - "{method.protocol.train_ratio}"
+          - --num-iterations
+          - "{method.protocol.num_iterations}"
+          - --num-bones
+          - "{method.protocol.num_bones}"
+          - --learning-rate
+          - "{method.protocol.learning_rate}"
+          - --batch-frames
+          - "{method.protocol.batch_frames}"
+          - --seed
+          - "{experiment.seed}"
+          - --device
+          - cuda
+        inputs:
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+          - "{run_dir}/motion/smpl_motion.npz"
+        outputs:
+          - "{run_dir}/bob/{case.id}/metadata.json"
+          - "{run_dir}/bob/{case.id}/bob_model.pt"
+          - "{run_dir}/bob/{case.id}/loss_history.npy"
+          - "{run_dir}/bob/{case.id}/warped_sequence.npy"
+          - "{run_dir}/bob/{case.id}/test_warped_sequence.npy"
+          - "{run_dir}/bob/{case.id}/frame_ids.npy"
+          - "{run_dir}/bob/{case.id}/point_indices.npy"
+          - "{run_dir}/bob/{case.id}/skinning_weights.npy"
+          - "{run_dir}/bob/{case.id}/skeleton_skinning_weights.npy"
+          - "{run_dir}/bob/{case.id}/diagnostic.png"
+      - id: evaluate
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+          OMP_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          NUMEXPR_NUM_THREADS: 1
+          PYTHONUNBUFFERED: 1
+          PYTHONFAULTHANDLER: 1
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.partmm_eval
+          - --gpu
+          - 0
+          - --sequence
+          - "{case.id}"
+          - --prediction-dir
+          - "{run_dir}/bob/{case.id}"
+          - --method-key
+          - bob
+          - --attribute-source
+          - target_frame
+          - --output
+          - "{run_dir}/evaluation/{case.id}.json"
+          - --d3dgs-root
+          - ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+          - --release-root
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs
+          - --dna-results-dir
+          - ${GA_D3DGS_DNA_RESULTS:-~/research/GA/Dynamic3DGaussians/server_output/dna_exp_1x}
+          - --actorshq-results-dir
+          - ${GA_D3DGS_ACTORSHQ_RESULTS:-~/research/GA/Dynamic3DGaussians/output/actorshq_exp}
+          - --data-dir
+          - ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+        inputs: ["{run_dir}/bob/{case.id}/warped_sequence.npy"]
+        outputs: ["{run_dir}/evaluation/{case.id}.json"]
+      - id: collect
+        type: collect_json
+        source: "{run_dir}/evaluation/{case.id}.json"
+        selectors:
+          psnr: bob.psnr
+          ssim: bob.ssim
+          lpips: bob.lpips
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{run_dir}/evaluation/{case.id}.json"]
+        outputs: ["{run_dir}/image_metrics.json"]

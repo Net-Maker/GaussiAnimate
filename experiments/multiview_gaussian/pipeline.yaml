@@ -1,0 +1,72 @@
+schema_version: 1
+release:
+  id: gaussianimate_multiview_v1
+  root: ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}
+  resource_policy:
+    code: redistributable_with_component_licenses
+    generated_results: pending_dataset_license_review
+    third_party_raw_data: reference_only
+resources: resources.yaml
+d3dgs:
+  root: ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+  python: ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+  actorshq_output: resources/multiview/d3dgs/actorshq
+  dna_output: resources/multiview/d3dgs/dna_rendering
+  logs: logs/d3dgs
+  protocol:
+    frames: 300
+    first_frame_iterations: 10000
+    later_frame_iterations: 2000
+    mask_background: true
+    pure_foreground_initialization: false
+    scale_mode_by_dataset:
+      dna_rendering: anisotropic
+      actorshq: isotropic
+    floor_loss: false
+    checkpoint_every_frames: 10
+derived:
+  runs: runs/multiview_novel_pose
+  ssdr_python: ${GA_SSDR_PYTHON:-~/anaconda3/envs/py38/bin/python}
+  ssdr_module_root: ${GA_DEMBONES_PYTHON:-~/research/code/DemBones-python/build}
+  protocol:
+    train_ratio: 0.8
+    bob_max_points: null
+    bob_opacity_threshold: 0
+    bob_iterations: 2000
+    bob_bones: 25
+    bob_learning_rate: 0.001
+    bob_batch_frames: 8
+    bob_adapter_id: gaussianimate_dressrecon_composed_pose_bob_v2
+    bob_joint_mapping_id: smpl_joints_1_23_to_rootless_links_v1
+    bob_pose_joint_range: [1, 24]
+    bob_pose_dimensions: 69
+    bob_skeleton_links: 23
+    bob_root_joint_id: 0
+    bob_root_pose_dimensions: 3
+    bob_root_handling: separate_excluded_from_rootless_fk
+    bob_root_translation_handling: not_consumed_by_adapter
+    bob_predicted_gaussian_attributes: [means3D]
+    bob_evaluation_attribute_source: target_frame
+    bob_oracle_evaluation_attributes:
+      - rgb_colors
+      - unnorm_rotations
+    partmm_algorithm: paper_spec_partmm
+    partmm_num_parts: 5
+    partmm_patch_size: 7
+    partmm_num_neighbors: 7
+    partmm_pyramid_levels: 5
+    partmm_pyramid_blend: 0.7
+    partmm_overlap_rings: 1
+    partmm_align_parts: true
+    partmm_alignment_mode: edge_wise
+    partmm_partition_mode: humanoid_five
+    partmm_bone_overlap_ratio: 1.5
+    ssdr_points: 10000
+    ssdr_bones: 50
+diagnostics:
+  historical_lbs: resources/multiview/diagnostics/lbs_nearest_surface
+evaluation:
+  root: resources/multiview/evaluation
+  train_ratio: 0.8
+  cameras: 4
+  metrics: [psnr, ssim, lpips]

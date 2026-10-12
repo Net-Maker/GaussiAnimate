@@ -1,0 +1,90 @@
+schema_version: 1
+name: multiview_paper_resources
+roots:
+  d3dgs: ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+  dressrecon: ${GA_DRESSRECON_ROOT:-~/research/code/dressrecon}
+  data: ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+  dna_raw: ${GA_DNA_RAW_ROOT:-~/research/data/DNA-Rendering}
+  dna_annotations: ${GA_DNA_ANNOTATIONS:-~/research/data/DNA-Rendering/data_used_in_4K4D/annotations}
+  dna_reader: ${GA_DNA_READER_ROOT:-~/research/data/DNA-Rendering/dna_rendering_sample_code}
+  actorshq_raw: ${GA_ACTORSHQ_RAW_ROOT:-/mnt/local_nas/wjx/actorshq}
+  actorshq_raw_alias: ${GA_ACTORSHQ_RAW_ALIAS:-~/research/GA/Dynamic3DGaussians/ActorsHQ/actorshq}
+  actorshq_smplx: ${GA_ACTORSHQ_SMPLX:-~/research/GA/Dynamic3DGaussians/actorshq_smplx}
+  actorshq_smplx_legacy: ${GA_ACTORSHQ_SMPLX_LEGACY:-~/research/data/actorshq_smplx}
+  dna_params: ${GA_D3DGS_DNA_RESULTS:-~/research/GA/Dynamic3DGaussians/server_output/dna_exp_1x}
+  actorshq_params: ${GA_D3DGS_ACTORSHQ_RESULTS:-/mnt/local_nas/wjx/GaussiAnimate_release_v1/resources/multiview/d3dgs/actorshq}
+  runs: ${GA_EXPERIMENT_RUNS_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1/runs}/multiview_novel_pose
+  ssdr: ${GA_D3DGS_SSDR_CACHE:-~/research/GA/Dynamic3DGaussians/output/gaussian_ssdr_cache}
+  dna_ssdr_source: ${GA_DNA_SSDR_SOURCE:-~/research/GA/hood/output/gaussian_ssdr_cache}
+  actorshq_ssdr_source: ${GA_ACTORSHQ_SSDR_SOURCE:-~/research/GA/Dynamic3DGaussians/output/gaussian_ssdr_cache_iso}
+  smpl_model: ${GA_SMPL_MODEL:-~/research/data/hood_data/aux_data/smpl/SMPL_NEUTRAL.pkl}
+runtime:
+  python: ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+  imports:
+    reconstruction: [torch, diff_gaussian_rasterization]
+    lbs: [igl, chumpy]
+    bob: [lab4d.nnutils.fit_bob]
+    evaluation: [lpips, skimage]
+derived_protocols:
+  bob:
+    method: smpl_conditioned_bag_of_bones
+    num_iterations: 2000
+    num_bones: 25
+    learning_rate: 0.001
+    batch_frames: 8
+    driven_points: all_gaussians
+    opacity_filter: null
+    point_subsampling: null
+    adapter_id: gaussianimate_dressrecon_composed_pose_bob_v2
+    joint_mapping_id: smpl_joints_1_23_to_rootless_links_v1
+    pose_joint_range: [1, 24]
+    pose_dimensions: 69
+    skeleton_links: 23
+    root_joint_id: 0
+    root_pose_dimensions: 3
+    root_handling: separate_excluded_from_rootless_fk
+    root_translation_handling: not_consumed_by_adapter
+    predicted_gaussian_attributes: [means3D]
+    evaluation_attribute_source: target_frame
+    oracle_evaluation_attributes:
+      - rgb_colors
+      - unnorm_rotations
+  partmm:
+    algorithm: paper_spec_partmm
+    num_parts: 5
+    patch_size: 7
+    num_neighbors: 7
+    pyramid_levels: 5
+    pyramid_blend: 0.7
+    overlap_rings: 1
+    align_parts: true
+    alignment_mode: edge_wise
+    partition_mode: humanoid_five
+    bone_overlap_ratio: 1.5
+datasets:
+  - id: dna_rendering
+    expected_frames: 150
+    expected_cameras: 48
+    cases:
+      - {id: dna_0012_11, data: dna_0012_11_1x, params: dna_0012_11_1x, raw: 0012_11-014.smc, annotation: 0012_11_annots.smc}
+      - {id: dna_0013_01, data: dna_0013_01_1x, params: dna_0013_01_1x, raw: 0013_01-018.smc, annotation: 0013_01_annots.smc}
+      - {id: dna_0013_03, data: dna_0013_03_1x, params: dna_0013_03_1x, raw: 0013_03-016.smc, annotation: 0013_03_annots.smc}
+      - {id: dna_0013_09, data: dna_0013_09_1x, params: dna_0013_09_1x, raw: 0013_09-005.smc, annotation: 0013_09_annots.smc}
+      - {id: dna_0013_11, data: dna_0013_11_1x, params: dna_0013_11_1x, raw: 0013_11-003.smc, annotation: 0013_11_annots.smc}
+      - {id: dna_0019_08, data: dna_0019_08_1x, params: dna_0019_08_1x, raw: 0019_08-004.smc, annotation: 0019_08_annots.smc}
+      - {id: dna_0021_03, data: dna_0021_03_1x, params: dna_0021_03_1x, raw: 0021_03-002.smc, annotation: 0021_03_annots.smc}
+      - {id: dna_0023_06, data: dna_0023_06_1x, params: dna_0023_06_1x, raw: 0023_06-017.smc, annotation: 0023_06_annots.smc}
+  - id: actorshq
+    expected_frames: 300
+    expected_cameras: 160
+    cases:
+      - {id: actorshq_actor01_seq1, data: actorshq_actor01_seq1, params: actorshq_actor01_seq1, raw: Actor01/Sequence1, start_frame: 822}
+      - {id: actorshq_actor01_seq2, data: actorshq_actor01_seq2, params: actorshq_actor01_seq2, raw: Actor01/Sequence2, start_frame: 758}
+      - {id: actorshq_actor02_seq1, data: actorshq_actor02_seq1, params: actorshq_actor02_seq1, raw: Actor02/Sequence1, start_frame: 743}
+      - {id: actorshq_actor02_seq2, data: actorshq_actor02_seq2, params: actorshq_actor02_seq2, raw: Actor02/Sequence2, start_frame: 1013}
+      - {id: actorshq_actor04_seq2, data: actorshq_actor04_seq2, params: actorshq_actor04_seq2, raw: Actor04/Sequence2, start_frame: 717}
+      - {id: actorshq_actor05_seq1, data: actorshq_actor05_seq1, params: actorshq_actor05_seq1, raw: Actor05/Sequence1, start_frame: 870}
+      - {id: actorshq_actor06_seq1, data: actorshq_actor06_seq1, params: actorshq_actor06_seq1, raw: Actor06/Sequence1, start_frame: 916}
+      - {id: actorshq_actor06_seq2, data: actorshq_actor06_seq2, params: actorshq_actor06_seq2, raw: Actor06/Sequence2, start_frame: 206}
+      - {id: actorshq_actor07_seq1, data: actorshq_actor07_seq1, params: actorshq_actor07_seq1, raw: Actor07/Sequence1, start_frame: 966}
+      - {id: actorshq_actor08_seq1, data: actorshq_actor08_seq1, params: actorshq_actor08_seq1, raw: Actor08/Sequence1, start_frame: 858}

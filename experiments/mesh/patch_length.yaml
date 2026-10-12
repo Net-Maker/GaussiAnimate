@@ -1,0 +1,58 @@
+schema_version: 2
+experiment:
+  id: partmm_patch_length
+  target_id: partmm_patch_length
+  title: PartMM temporal patch-length ablation
+  paper_target: Table 5 / PartMM patch length
+  seed: 42
+output_dir: ../runs/partmm_patch_length
+datasets:
+  - id: vto_tshirt
+    label: VTO T-shirt
+    protocol: five frozen training sequences and five frozen held-out sequences
+    cases:
+      - {id: p3, patch_size: 3}
+      - {id: p5, patch_size: 5}
+      - {id: p7, patch_size: 7}
+      - {id: p11, patch_size: 11}
+      - {id: p15, patch_size: 15}
+methods:
+  - id: partmm
+    label: PartMM
+    mode: external
+    stages:
+      - id: evaluate
+        type: command
+        resources: {gpu: true}
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        command:
+          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - -m
+          - experiments.mesh.patch_length
+          - --patch-size
+          - "{case.patch_size}"
+          - --source
+          - "{run_dir}/raw/per_case_summary.json"
+          - --output
+          - "{run_dir}/geometry_metrics.json"
+          - --expected-cases
+          - tshirt_shape00_91_33,tshirt_shape00_91_36,tshirt_shape00_91_38,tshirt_shape00_91_61,tshirt_shape00_91_62
+          - --run-if-missing
+          - --runner-code-root
+          - ${GA_VTO_PARTMM_CODE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/code}
+          - --vto-root
+          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}
+          - --smpl-model-path
+          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
+          - --smpl-fk-model-dir
+          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
+          - --ssdr-cache
+          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
+          - --device
+          - cuda
+        inputs:
+          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
+          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}/tshirt/simulations
+        outputs:
+          - "{run_dir}/raw/per_case_summary.json"
+          - "{run_dir}/geometry_metrics.json"

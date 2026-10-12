@@ -1,0 +1,62 @@
+schema_version: 1
+experiment:
+  name: mesh
+  family: nonrigid_mesh
+  seed: 42
+dataset:
+  name: deformingthings4d
+  variant: dt4d
+  version: official_release
+  point_sequence: ${GA_MESH_POINTS}
+  canonical_mesh: null
+  high_motion_target_frames: 200
+  split: 0.8
+  overrides:
+    vto:
+      skelebone:
+        num_bones: 20
+    dt4d:
+      skelebone:
+        num_bones: 50
+output_dir: experiments/runs/mesh
+skelebone:
+  num_bones: 50
+  rest_frame: 0
+  ssdr_tolerance: 0.001
+  ssdr_patience: 3
+  ssdr_max_iterations: 100
+  ssdr_max_influences: 4
+  ssdr_weight_smoothness: 0.0
+  ssdr_bind_update: 2
+  mesh_frame: 0
+  mesh_poisson_depth: 9
+  mesh_normal_radius: null
+  mesh_normal_neighbors: 30
+  mesh_normal_consistency_neighbors: 15
+  mesh_density_quantile: 0.01
+  mesh_minimum_component_triangles: 10
+  mesh_target_triangles: 20000
+  curve_skeleton_bin: ${GA_CURVE_SKELETON_BIN}
+  curve_quality: 0.1
+  curve_medial: 0.25
+  curve_timeout_seconds: 300.0
+  curve_correspondence_neighbors: 3
+  skinning_transfer_neighbors: 1
+  skinning_align_bbox: false
+  joint_score_threshold: 0.3
+  joint_merge_distance: 0.08
+  joint_peak_window_hops: 8
+  joint_max_count: null
+  joint_track_neighbors: 20
+partmm:
+  num_parts: 5
+  patch_size: 7
+  num_neighbors: 7
+  pyramid_levels: 5
+  pyramid_blend: 0.7
+  blend_temperature: 0.1
+  overlap_rings: 1
+  align_parts: true
+evaluation:
+  metrics: [ssdr_rmse, point_rmse, normalized_rmse]
+  save_visualization: true

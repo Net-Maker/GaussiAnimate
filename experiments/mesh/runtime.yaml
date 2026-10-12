@@ -1,0 +1,51 @@
+schema_version: 2
+experiment:
+  id: partmm_runtime
+  target_id: partmm_runtime
+  title: PartMM runtime analysis
+  paper_target: Fig. R.2 / PartMM runtime
+  seed: 42
+output_dir: ../runs/partmm_runtime
+datasets:
+  - id: vto
+    label: VTO T-shirt (840 database + 203 query frames, 20 bones)
+    cases:
+      - tshirt_shape00_91_33
+methods:
+  - id: partmm
+    label: PartMM
+    mode: external
+    stages:
+      - id: benchmark
+        type: command
+        resources: {gpu: true}
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        command:
+          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - -m
+          - experiments.mesh.runtime
+          - --output
+          - "{run_dir}/runtime_metrics.json"
+          - --code-root
+          - ${GA_VTO_PARTMM_CODE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/code}
+          - --python
+          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - --result-dir
+          - "{run_dir}/raw"
+          - --vto-root
+          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}
+          - --smpl-model-path
+          - ${GA_SMPL_MODEL:-~/research/lib/SMPL_python_v.1.1.0/smpl/models/SMPL_FEMALE.pkl}
+          - --smpl-fk-model-dir
+          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
+          - --ssdr-cache
+          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
+          - --target-sequence
+          - "{case.id}"
+          - --runtime-detail
+          - ${GA_VTO_RUNTIME_DETAIL:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/runtime_partmm_detail/partmm_runtime_v2_tshirt_shape00_91_33.json}
+        inputs:
+          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
+          - "${GA_VTO_ROOT:-~/research/data/vto-dataset}/tshirt/simulations/{case.id}.pkl"
+          - ${GA_VTO_RUNTIME_DETAIL:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/runtime_partmm_detail/partmm_runtime_v2_tshirt_shape00_91_33.json}
+        outputs: ["{run_dir}/runtime_metrics.json"]

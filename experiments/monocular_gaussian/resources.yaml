@@ -1,0 +1,58 @@
+schema_version: 1
+roots:
+  historical_riggs: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+  release: ${GA_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/monocular
+datasets:
+  - id: dnerf
+    expected_test_frames: 20
+    cases:
+      - hellwarrior
+      - hook
+      - jumpingjacks
+      - mutant
+      - standup
+      - trex
+  - id: dgmesh
+    expected_test_frames: 200
+    cases:
+      - beagle
+      - bird
+      - duck
+      - girlwalk
+      - horse
+methods:
+  - id: ours
+    classification: historical_stage1_reconstruction_diagnostic_not_paper_ours
+    source: outputs/stage1_res
+    case_patterns:
+      - "{case}_512_node/test/ours_*"
+    cfg_patterns:
+      - "{case}_512_node/cfg_args"
+    required_cfg:
+      use_skinning_weight_mlp: false
+      use_template_offsets: false
+  - id: riggs
+    classification: riggs_final_rigged_stage
+    source: saved_final_results_for_skeleton
+    case_patterns:
+      - "{case}_512_final_node/test/ours_*"
+      - "{case}_512_final_node_exp_ours/test/ours_*"
+    cfg_patterns:
+      - "{case}_512_final_node/cfg_args"
+      - "{case}_512_final_node_exp_ours/cfg_args"
+    required_cfg:
+      use_skinning_weight_mlp: true
+      use_template_offsets: true
+external_methods:
+  - dnerf
+  - tineuvox
+  - 4dgs
+  - scgs
+  - apnerf
+paper_metrics:
+  ours:
+    dnerf: {psnr: 41.00, ssim: 0.996, lpips: 0.0154}
+    dgmesh: {psnr: 37.59, ssim: 0.990, lpips: 0.0220}
+  riggs:
+    dnerf: {psnr: 40.82, ssim: 0.996, lpips: 0.0112}
+    dgmesh: {psnr: 37.65, ssim: 0.991, lpips: 0.0169}

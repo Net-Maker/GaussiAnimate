@@ -1,0 +1,202 @@
+paper: GaussiAnimate
+schema_version: 1
+audit:
+  as_of: 2026-09-11
+  overall_ready: false
+  acceptance_rule: A target is verified only after every declared case can be recomputed from the recorded inputs and the aggregated output has been compared with the paper.
+experiments:
+  - target_id: synthetic_novel_view
+    target: Table 2 / unseen-view synthetic reconstruction
+    config: monocular_gaussian/novel_view.yaml
+    datasets: [D-NeRF, DG-Mesh]
+    methods: [D-NeRF, TiNeuVox, 4D-GS, SC-GS, AP-NeRF, RigGS, GaussiAnimate]
+    readiness:
+      state: blocked
+      verified:
+        - GaussiAnimate training entry point and all 11 source datasets are present.
+        - Historical RigGS-derived stage-one reconstruction test renders are recovered for 10 of 11 sequences and explicitly classified as diagnostic, not final-paper Ours evidence.
+        - Historical RigGS final-stage test renders are recovered for 10 of 11 sequences.
+        - RigGS D-NeRF best-test TensorBoard metrics reproduce the rounded paper row (40.82 PSNR / 0.996 SSIM / 0.0112 LPIPS).
+        - All recovered renders have content hashes, filtered release links, and offline PSNR / SSIM / LPIPS results.
+      blockers:
+        - Horse has trained RigGS final checkpoints and point trajectories but no recovered test render tree; the GaussiAnimate reconstruction-stage render is also absent.
+        - D-NeRF, TiNeuVox, 4D-GS, SC-GS and AP-NeRF remain artifact-only; only isolated checkpoints, not complete 11-case test renders, were found in the historical workspaces.
+        - The recovered GaussiAnimate stage1 D-NeRF TensorBoard average is 40.21 / 0.995 / 0.0170, not the paper Ours row 41.00 / 0.996 / 0.0154; this tree is not valid final-paper evidence.
+        - DG-Mesh aggregation is incomplete for both recovered methods because Horse is absent.
+        - Metrics recomputed from quantized PNG files differ from training-time TensorBoard scalars; the paper row follows the best-test training scalars, and both evidence paths are now retained separately.
+  - target_id: human_novel_pose
+    target: Table 3 / unseen-pose clothed-human rendering
+    config: multiview_gaussian/novel_pose.yaml
+    resources: multiview_gaussian/resources.yaml
+    datasets: [DNA-Rendering, ActorsHQ]
+    methods: [D3DGS-GT, SMPL-LBS, SMPL-BoB, SMPL-PartMM, SMPL-PartMM-historical-diagnostic]
+    readiness:
+      state: in_progress
+      verified:
+        - Historical D3DGS oracle, SMPL-LBS, SMPL-BoB and SSDR diagnostic summaries cover all 18 cases.
+        - Re-aggregation of the hash-frozen D3DGS oracle, SMPL-LBS and SMPL-BoB summaries reproduces both printed dataset rows within the table's displayed precision.
+        - Exhaustive evaluation of all 45 eight-sequence ActorsHQ subsets finds none that reproduces all three printed D3DGS, LBS and BoB rows; the recovered ten-sequence aggregate does.
+        - The 18 per-case BoB metric records are packaged as aggregate-only evidence; two of 18 corresponding BoB models were recovered.
+        - All ten ActorsHQ SMPL-X source ranges are present and now connected through the resource manifest.
+        - The SMPL-PartMM experiment now has separate paper-spec and historical-table diagnostic variants; both fit SSDR only on the training prefix and render only held-out frames.
+        - The paper-spec PartMM variant and its training-only SSDR cache complete for all 18 cases; fresh held-out rendering gives 24.8321 / 0.947513 / 0.049345 on DNA and 18.0284 / 0.764458 / 0.243662 on ActorsHQ.
+        - The public SMPL-LBS path implements robust surface matching, biharmonic inpainting and smoothing, then projects weights to every Gaussian; all 18 cases have deterministic raw outputs and held-out renders, giving 24.0262 / 0.946836 / 0.048609 on DNA and 16.5577 / 0.746171 / 0.247294 on ActorsHQ.
+        - All 18 final D3DGS checkpoints and held-out oracle evaluations are complete. Fresh D3DGS rendering gives 32.1535 / 0.978340 / 0.033200 on DNA and 30.3015 / 0.936229 / 0.137302 on the recovered ten-sequence ActorsHQ aggregate.
+        - Twelve older all-Gaussian SMPL-BoB runs and 1,920 held-out render comparisons are retained as v1 diagnostic evidence; their eight-case DNA aggregate is 23.1285 PSNR / 0.93313 SSIM / 0.05812 LPIPS.
+      blockers:
+        - The paper prose declares 8 ActorsHQ subjects, while the only recovered aggregate that reproduces the printed D3DGS, LBS and BoB rows contains 10 sequences from 7 actor identities; the authoritative 8-case subset is not recorded.
+        - "Current BoB-v2 coverage is still incomplete: all 18 original runs failed because PyTorch 1.12 with CUDA 11.6 attempted to JIT-compile torch.sinc for the RTX 4090's unsupported sm_89 target. The adapter now uses an equivalent stable conversion without Jiterator, and the 18-case recomputation is running."
+        - The historical PartMM-labelled artifact is an all-frame SSDR reconstruction, not an 80/20 PartMM run, and is invalid as PartMM evidence.
+        - Fresh paper-spec PartMM is 3.45 dB below the paper row on DNA and 6.23 dB below it on ActorsHQ, so completing the written protocol does not reproduce the printed values.
+        - The historical human LBS script copies nearest-triangle barycentric weights rather than the cited robust algorithm, so its aggregate is retained only as historical evidence; the new public robust path is complete but still differs from the printed ActorsHQ row.
+        - Historical BoB runs filter/subsample points and fill omitted Gaussians from test-frame ground truth during rendering; the public config requires all Gaussians, and its 18-case rerun is not yet complete.
+        - The recovered table evaluator replaces positions but uses target-frame D3DGS colors and rotations. The public config records this explicitly to reproduce the historical rendering path, but the paper does not document the attribute-source choice.
+        - The exact PartMM implementation is still an uncommitted local research snapshot under /research/GA/In2You; its source must be frozen under a redistributable license before the repository is fully open source.
+        - DNA-Rendering, ActorsHQ, and the Gaussian rasterizer retain third-party terms; redistribution of trained checkpoints and rendered assets still needs dataset/license review even though the public adapter code is MIT.
+        - The paper specifies five overlapping parts, k=7, five pyramid levels and 0.7 blending, while the recovered table-run implementation uses six fixed SMPL groups and a different refinement path; no immutable source snapshot ties the printed row to the written protocol.
+        - Both PartMM variants have been rendered and evaluated on all 18 cases, but neither reproduces the printed PartMM row; they remain implementation diagnostics while the paper-era protocol discrepancy is unresolved.
+  - target_id: multiview_d3dgs_reconstruction
+    target: Table 3 / shared D3DGS reconstruction
+    config: multiview_gaussian/reconstruction.yaml
+    resources: multiview_gaussian/resources.yaml
+    datasets: [DNA-Rendering, ActorsHQ]
+    methods: [D3DGS]
+    readiness:
+      state: partial
+      verified:
+        - All 18 params.npz files pass schema and frame-count checks and have SHA-256 source provenance.
+        - All 18 normalized held-out oracle evaluations complete from those checkpoints.
+        - The DNA aggregate is 32.1535 / 0.978340 / 0.033200, matching the paper row to within 0.01 dB PSNR and displayed SSIM/LPIPS precision.
+      blockers:
+        - The recovered ten-sequence ActorsHQ aggregate is 30.3015 / 0.936229 / 0.137302 rather than the paper's 30.56 / 0.938 / 0.136, and the authoritative eight-subject subset is not recorded.
+  - target_id: vto_garment_animation
+    target: Table 4 / VTO garment animation
+    config: mesh/vto_animation.yaml
+    datasets: [VTO-Tshirt, VTO-Dress]
+    methods: [Robust-LBS, MLP, GRU, FullMM, PartMM]
+    readiness:
+      state: partial
+      verified:
+        - The exact first-five training sets and the five T-shirt / three Dress evaluation targets are recovered and frozen in the config.
+        - Source inspection confirms that the reported value is the mean per-frame per-vertex Euclidean distance in millimeters, although the paper labels it RMSE.
+        - The full per-case T-shirt and Dress prediction arrays for MLP, GRU, FullMM and PartMM are recovered, independently re-aggregated and packaged with content hashes.
+        - Robust-LBS has been recomputed with closest-surface matching, biharmonic weight inpainting and smoothing; all eight per-frame prediction arrays and transferred weights are packaged and internally consistent.
+        - T-shirt and Dress PartMM plus Dress FullMM reproduce the paper entries at one decimal.
+        - All ten schema-v2 jobs were rerun or independently re-aggregated on 2026-09-09; the experiment report has complete case coverage.
+      blockers:
+        - The public Robust-LBS recomputation is 26.45 / 47.85 mm rather than the paper's 33.7 / 52.2 mm; no original paper-run weights or immutable source revision were recovered to explain the discrepancy.
+        - T-shirt FullMM re-aggregates to 38.38 mm rather than the paper's 38.2 mm.
+        - MLP and GRU recomputations differ from the paper entries and need the original checkpoint provenance frozen.
+  - target_id: d4d_animal_animation
+    target: Table 4 / D4D animal animation
+    config: mesh/dt4d_animation.yaml
+    datasets: [DeformingThings4D]
+    methods: [Historical-distance-LBS-proxy, MLP, GRU, FullMM, Historical-PartMM-proxy]
+    readiness:
+      state: partial
+      verified:
+        - The exact 26-instance artifact is hash-frozen and independently re-aggregated; its historical lbs and mm_part_local fields round to the displayed 65.3 and 54.6 mm values.
+        - Source inspection confirms that the reported value is the mean per-frame per-vertex Euclidean distance in millimeters, although the paper labels it RMSE.
+        - All five schema-v2 jobs completed on 2026-09-09 and reproduce the stored 26-instance aggregate without substituting paper values.
+      blockers:
+        - FullMM re-aggregates to 53.37585 mm, which rounds to 53.4 rather than the paper's 53.3.
+        - MLP and GRU re-aggregate to 70.7 and 56.0 mm rather than the paper's 68.8 and 58.4.
+        - The recovered benchmark uses motion-prefix leave-one-out with similarity and temporal fallbacks rather than the paper's uniform five-source/one-held-out split.
+        - The recovered lbs field uses inverse-distance-to-bone weights with power four, not the paper-stated robust BBW transfer, so it is a historical LBS proxy despite matching the displayed value.
+        - The recovered PartMM-labelled field is per-frame nearest-neighbor retrieval on local rotations; it does not implement the stated patch size 7, k=7, five pyramid levels, or part-alignment protocol.
+        - The paper is internally inconsistent about the D4D population (59 animal types in the experiment section and 57 categories in the appendix), and neither count identifies the exact evaluated 26 instances.
+  - target_id: arap_ssdr_ablation
+    target: Fig. 8 / ARAP and SSDR
+    config: monocular_gaussian/arap_ssdr_ablation.yaml
+    datasets: [DG-Mesh-girlwalk]
+    methods: [ARAP-SSDR, no-ARAP-SSDR, ARAP-raw-nodes]
+    readiness:
+      state: blocked
+      verified:
+        - The paper figure is identified as the single DG-Mesh girlwalk case with exactly three ARAP/SSDR combinations.
+        - The recovered stage-one deformation checkpoint provides the ARAP plus raw-node branch, and the public exporter reproduces its Gaussian-kernel KNN weights directly from xyz plus learned hyperfeatures without SSDR.
+        - A complete historical ARAP plus SSDR girlwalk result is present.
+      blockers:
+        - No historical checkpoint trained with no_arap_loss was found, so the middle SSDR-without-ARAP column must be retrained.
+        - The exact three source renders used to compose the paper PDF have not been recovered.
+        - The qualitative figure has not yet been regenerated from all three public branches and compared with the paper PDF.
+  - target_id: progressive_skeletonization
+    target: Fig. 9 / progressive skeletonization
+    config: monocular_gaussian/progressive_skeleton.yaml
+    datasets: [DG-Mesh-T-Rex]
+    methods: [GaussiAnimate]
+    readiness:
+      state: partial
+      verified:
+        - The paper figure identity and displayed columns are recovered as T-Rex at 0, 30, 60, 80 and 100 percent.
+        - The historical frame-ablation implementation confirms first-N-frame prefixes from a 200-frame trajectory, fixed 30000-point sampling, 50 requested SSDR bones and the canonical frame-zero mesh.
+        - Historical 30, 60 and 80 percent summaries have the matching 60, 120 and 160 frame counts and contain skeleton outputs.
+        - The public pipeline now completes all five declared columns from the same 200-frame input and writes full skelebones, BVH and a shared-view comparison; the resulting inner-joint counts are 53, 71, 72, 72 and 77.
+      blockers:
+        - "The regenerated public columns do not visually reproduce the paper PDF: the public skeletons are substantially denser, and the paper's 0 percent column has no corresponding lower-row skeleton while the public single-frame definition produces 53 joints."
+        - The recovered historical run starts at 10 percent, so no immutable artifact or implementation explains how the paper's 0 percent column was produced.
+        - The recovered historical 100 percent artifact remains SSDR-only; the public 100 percent recomputation completes, but its topology has not been tied to the paper-era joint pruning and simplification code.
+  - target_id: partmm_runtime
+    target: Fig. R.2 / PartMM runtime
+    config: mesh/runtime.yaml
+    datasets: [VTO-Tshirt]
+    methods: [PartMM]
+    readiness:
+      state: partial
+      verified:
+        - The exact historical 840-frame database, 203-frame query and 20-bone timing record is recovered and internally consistent.
+        - The recovered 13.5026 ms per-frame measurement rounds to the paper's 13.5 ms.
+        - A later 14.9293 ms remeasurement of the same target sequence is retained as separate evidence rather than replacing the paper result.
+      blockers:
+        - The original timing run has no recorded hardware/software manifest.
+        - The recovered experiment source tree is uncommitted and has no immutable source revision.
+  - target_id: partmm_patch_length
+    target: Table 5 / PartMM patch length ablation
+    config: mesh/patch_length.yaml
+    datasets: [VTO-Tshirt]
+    methods: [PartMM]
+    readiness:
+      state: verified
+      verified:
+        - The camera-ready protocol fixes five training sequences, five held-out T-shirt sequences, and patch lengths 3, 5, 7, 11, and 15.
+        - The public evaluator rejects aggregate-only records and recomputes each value from the frozen per-case rows.
+        - All five settings completed from per-case records and recompute to 17.1671, 16.8020, 17.3642, 18.7881, and 20.5606 mm.
+        - "Those values round exactly to every paper entry: 17.17, 16.80, 17.36, 18.79, and 20.56 mm."
+      blockers: []
+  - target_id: partmm_database_scaling
+    target: Table R.1 / PartMM database coverage and cost
+    config: mesh/database_scaling.yaml
+    datasets: [VTO-Tshirt]
+    methods: [PartMM]
+    readiness:
+      state: partial
+      verified:
+        - Independent scalability results reproduce the RMSE column at 5, 20, and 50 training sequences as 17.3642, 15.7412, and 15.2732 mm.
+        - A fresh RTX 4090 D profile covers all three database sizes and records the exact database/query frame counts, source hashes, environment, build time, prediction time, and peak CUDA allocation.
+        - Peak GPU allocations are 143.72, 355.69, and 1000.68 MiB, reproducing the displayed 144, 356, and 1001 MB entries.
+        - PartMM quaternion coverage is 0.10045, 0.09039, and 0.07454 radians, close to the displayed 0.0988, 0.0888, and 0.0736.
+      blockers:
+        - Fresh build timings of 14.94, 31.40, and 43.48 seconds do not reproduce the paper's 10.5, 25.9, and 66.3 seconds and vary substantially between repeated runs.
+        - Fresh prediction timings of 19.92, 21.61, and 27.95 ms do not reproduce every displayed entry (16.0, 22.3, and 27.0 ms); timing requires the original hardware/software state to be exact.
+        - The recovered experiment source is an uncommitted research snapshot, so the small pose-coverage discrepancy cannot yet be tied to an immutable paper-era revision.
+local_reproductions:
+  catalog: reproductions/catalog.yaml
+  policy: Portable metrics, configs, and locally authored adapters are checked in; datasets, checkpoints, and render trees remain external.
+  experiments:
+    - target_id: reproduction_dressrecon_original
+      target: DressRecon DNA baseline and motion-matching reproduction
+      config: reproductions/dressrecon_original.yaml
+      result: reproductions/results/dressrecon_original.json
+    - target_id: reproduction_human_novel_pose
+      target: DressRecon BoB, robust LBS, and SSDR diagnostic human evidence
+      config: reproductions/human_novel_pose.yaml
+      recompute: reproductions/dressrecon_bob_recompute.yaml
+      result: reproductions/results/human_novel_pose.json
+    - target_id: reproduction_cross_method_skeletonization
+      target: Skeletonization across reproduced dynamic reconstruction methods
+      config: reproductions/cross_method_skeletonization.yaml
+      result: reproductions/results/cross_method_skeletonization.json
+    - target_id: reproduction_deform2dgs_observation_split
+      target: Deform-2DGS observation-fraction experiment
+      config: reproductions/deform2dgs_observation_split.yaml
+      result: reproductions/results/deform2dgs_observation_split.json

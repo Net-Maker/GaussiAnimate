@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments and editors
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Local datasets, checkpoints, and generated runs
+data/
+output/
+outputs/
+saved_final_results/
+experiments/runs/
+checkpoints/
+screenshot/
+wandb/
+*.pth
+*.ckpt
+*.pt
+*.fbx
+*.blend1
+
+# Generated media and intermediate geometry
+*.mp4
+*.gif
+*.avi
+*.mov
+temp.*
+
+# Build products
+build/
+dist/
+.native/
+*.egg-info/
+*.local.json
+
+# Local pre-release code, results, and large visualization assets.
+.research/
+
+# Approved public examples; other generated animations remain local.
+!partmm/examples/partmm_hood.gif
+!skelebone/examples/ama_skelebone.gif
+
+# Machine-specific configuration and credentials.
+.env
+.env.*
+!.env.example
+.agents/
+.codex/

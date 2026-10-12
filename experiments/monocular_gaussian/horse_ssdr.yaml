@@ -1,0 +1,21 @@
+riggs_root: ${GA_RIGGS_ROOT}
+model_path: ${GA_HORSE_RECONSTRUCTION}
+iteration: 39000
+num_bones: 50
+rest_frame: 0
+seed: 42
+# Density-invariant motion initialization prevents small articulated regions
+# from being pruned on densified Gaussian clouds.
+ssdr_protocol: motion_pointcloud
+ssdr_max_points: null
+ssdr_initialization: motion
+ssdr_initialization_frames: 40
+ssdr_initialization_components: 16
+ssdr_initialization_spatial_weight: 0.35
+ssdr_require_num_bones: true
+ssdr_weight_transfer: nearest
+ssdr_tolerance: 0.0001
+ssdr_patience: 5
+ssdr_max_iterations: 50
+ssdr_max_influences: 4
+output_dir: ${GA_HORSE_SSDR_OUTPUT}

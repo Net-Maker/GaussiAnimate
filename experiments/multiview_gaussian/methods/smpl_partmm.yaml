@@ -1,0 +1,186 @@
+schema_version: 1
+kind: experiment_methods
+methods:
+  - id: smpl_partmm
+    label: SMPL + PartMM
+    variant: paper_spec
+    mode: external
+    protocol:
+      id: smpl_partmm_paper_spec_v1
+      status: written_paper_protocol
+      train_ratio: 0.8
+      num_parts: 5
+      patch_size: 7
+      num_neighbors: 7
+      pyramid_levels: 5
+      pyramid_blend: 0.7
+      overlap_rings: 1
+      alignment_mode: edge_wise
+      partition_mode: humanoid_five
+      bone_overlap_ratio: 1.5
+    stages: &partmm_stages
+      - id: fit_ssdr
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${GA_DEMBONES_PYTHON:-~/research/code/DemBones-python/build}:${PYTHONPATH:-}
+        command:
+          - ${GA_SSDR_PYTHON:-~/anaconda3/envs/py38/bin/python}
+          - -m
+          - experiments.multiview_gaussian.ssdr_cache
+          - --params
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+          - --output-dir
+          - "{run_dir}/ssdr"
+          - --output
+          - "{run_dir}/ssdr/train_only.npz"
+          - --case
+          - "{case.id}"
+          - --num-bones
+          - 50
+          - --ssdr-points
+          - 10000
+          - --seed
+          - "{experiment.seed}"
+          - --train-ratio
+          - "{method.protocol.train_ratio}"
+        inputs:
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+        outputs:
+          - "{run_dir}/ssdr/train_only.npz"
+          - "{run_dir}/ssdr/train_only.json"
+      - id: export_smpl_motion
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.human_pose
+          - --case
+          - "{case.id}"
+          - --output
+          - "{run_dir}/motion/smpl_motion.npz"
+          - --resources
+          - ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}/experiments/multiview_gaussian/resources.yaml
+          - --smpl-model
+          - ${GA_SMPL_MODEL:-~/research/data/hood_data/aux_data/smpl/SMPL_NEUTRAL.pkl}
+          - --dna-annotations
+          - ${GA_DNA_ANNOTATIONS:-~/research/data/DNA-Rendering/data_used_in_4K4D/annotations}
+          - --dna-reader-root
+          - ${GA_DNA_READER_ROOT:-~/research/data/DNA-Rendering/dna_rendering_sample_code}
+          - --actorshq-smplx
+          - ${GA_ACTORSHQ_SMPLX:-~/research/GA/Dynamic3DGaussians/actorshq_smplx}
+          - --frames
+          - "{dataset.frames}"
+          - --fps
+          - 30
+        outputs:
+          - "{run_dir}/motion/smpl_motion.npz"
+      - id: animate
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+        command:
+          - ${GA_PARTMM_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - -m
+          - experiments.multiview_gaussian.paper_partmm
+          - --variant
+          - "{method.variant}"
+          - --experiment-config
+          - "{config_path}"
+          - --method-id
+          - "{method.id}"
+          - --params
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs/{dataset.id}/{case.id}/params.npz
+          - --ssdr-cache
+          - "{run_dir}/ssdr/train_only.npz"
+          - --motion
+          - "{run_dir}/motion/smpl_motion.npz"
+          - --output-dir
+          - "{run_dir}/partmm/{case.id}"
+          - --implementation-root
+          - ${GA_PARTMM_ROOT:-~/research/GA/In2You}
+          - --motion2motion-root
+          - ${GA_MOTION2MOTION_ROOT:-~/research/GA/Cloth3D/Motion2Motion_codes}
+          - --smpl-model-dir
+          - ${GA_SMPL_MODEL_DIR:-~/research/GA/Cloth3D/smpl2bvh/data/smpl/smpl}
+          - --train-ratio
+          - "{method.protocol.train_ratio}"
+          - --device
+          - ${GA_PARTMM_DEVICE:-cuda}
+        inputs:
+          - "{config_path}"
+          - "{config_dir}/methods/smpl_partmm.yaml"
+          - "{run_dir}/ssdr/train_only.npz"
+          - "{run_dir}/motion/smpl_motion.npz"
+        outputs:
+          - "{run_dir}/partmm/{case.id}/metadata.json"
+          - "{run_dir}/partmm/{case.id}/warped_sequence.npy"
+          - "{run_dir}/partmm/{case.id}/test_warped_sequence.npy"
+          - "{run_dir}/partmm/{case.id}/frame_ids.npy"
+          - "{run_dir}/partmm/{case.id}/bone_transforms.npy"
+          - "{run_dir}/partmm/{case.id}/point_indices.npy"
+          - "{run_dir}/partmm/{case.id}/diagnostic.png"
+      - id: evaluate
+        type: command
+        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        env:
+          PYTHONPATH: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}:${PYTHONPATH:-}
+          OMP_NUM_THREADS: 1
+          MKL_NUM_THREADS: 1
+          OPENBLAS_NUM_THREADS: 1
+          NUMEXPR_NUM_THREADS: 1
+          PYTHONUNBUFFERED: 1
+          PYTHONFAULTHANDLER: 1
+        command:
+          - ${GA_D3DGS_PYTHON:-~/anaconda3/envs/dynamic_gaussians/bin/python}
+          - -m
+          - experiments.multiview_gaussian.partmm_eval
+          - --gpu
+          - 0
+          - --sequence
+          - "{case.id}"
+          - --prediction-dir
+          - "{run_dir}/partmm/{case.id}"
+          - --output
+          - "{run_dir}/evaluation/{case.id}.json"
+          - --d3dgs-root
+          - ${GA_D3DGS_ROOT:-~/research/GA/Dynamic3DGaussians}
+          - --release-root
+          - ${GA_MULTIVIEW_RELEASE_ROOT:-/mnt/local_nas/wjx/GaussiAnimate_release_v1}/resources/multiview/d3dgs
+          - --dna-results-dir
+          - ${GA_D3DGS_DNA_RESULTS:-~/research/GA/Dynamic3DGaussians/server_output/dna_exp_1x}
+          - --actorshq-results-dir
+          - ${GA_D3DGS_ACTORSHQ_RESULTS:-~/research/GA/Dynamic3DGaussians/output/actorshq_exp}
+          - --data-dir
+          - ${GA_D3DGS_DATA:-~/research/GA/Dynamic3DGaussians/data}
+          - --attribute-source
+          - target_frame
+        inputs:
+          - "{run_dir}/partmm/{case.id}/warped_sequence.npy"
+        outputs: ["{run_dir}/evaluation/{case.id}.json"]
+      - id: collect
+        type: collect_json
+        source: "{run_dir}/evaluation/{case.id}.json"
+        selectors:
+          psnr: partmm.psnr
+          ssim: partmm.ssim
+          lpips: partmm.lpips
+          vertex_rmse_mm: partmm_vertex_rmse_mm
+        output: "{run_dir}/image_metrics.json"
+        inputs: ["{run_dir}/evaluation/{case.id}.json"]
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: smpl_partmm_historical
+    label: SMPL + PartMM (historical table-run diagnostic)
+    variant: historical
+    mode: external
+    protocol:
+      id: smpl_partmm_historical_v1
+      status: recovered_implementation_diagnostic
+      train_ratio: 0.8
+      source_groups: 6
+      alignment_mode: edge_wise
+    stages: *partmm_stages

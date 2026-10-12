@@ -1,0 +1,26 @@
+schema_version: 1
+release_root: /mnt/local_nas/wjx/GaussiAnimate_release_v1
+output_dir: experiments/runs/partmm_repair_20260913_final
+seed: 42
+train_ratio: 0.8
+validation_ratio: 0.2
+distance_quantile: 0.95
+distance_policy: validation_error
+partmm:
+  num_parts: 5
+  patch_size: 7
+  num_neighbors: 7
+  pyramid_levels: 5
+  pyramid_blend: 0.7
+  alignment_mode: edge_wise
+  alignment_frames: per_frame
+  blend_space: bone_center
+  partition_mode: humanoid_five
+  overlap_rings: 1
+  bone_overlap_ratio: 1.5
+cases:
+  - {dataset: dna_rendering, id: dna_0012_11}
+  - {dataset: dna_rendering, id: dna_0021_03}
+  - {dataset: actorshq, id: actorshq_actor01_seq1}
+  - {dataset: actorshq, id: actorshq_actor01_seq2}
+save_predictions: true

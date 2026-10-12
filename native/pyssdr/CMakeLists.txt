@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.16)
+project(gaussianimate_pyssdr LANGUAGES CXX)
+
+# Development.Module requires CMake >= 3.18; fall back to full Development on older CMake.
+if(CMAKE_VERSION VERSION_LESS 3.18)
+    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+else()
+    find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+endif()
+find_package(Eigen3 3.2 REQUIRED)
+find_package(OpenMP)
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/pybind11/CMakeLists.txt")
+    add_subdirectory(vendor/pybind11 EXCLUDE_FROM_ALL)
+else()
+    find_package(pybind11 CONFIG REQUIRED)
+endif()
+
+pybind11_add_module(pyssdr MODULE pyssdr.cpp)
+target_compile_features(pyssdr PRIVATE cxx_std_14)
+target_include_directories(pyssdr PRIVATE include)
+if(TARGET Eigen3::Eigen)
+    target_link_libraries(pyssdr PRIVATE Eigen3::Eigen)
+else()
+    target_include_directories(pyssdr PRIVATE "${EIGEN3_INCLUDE_DIR}")
+endif()
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(pyssdr PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
+install(TARGETS pyssdr LIBRARY DESTINATION .)

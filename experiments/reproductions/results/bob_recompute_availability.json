@@ -1,0 +1,200 @@
+{
+  "all_fit_ready": false,
+  "by_dataset": {
+    "actorshq": {
+      "cases": 10,
+      "evaluation_ready": 3,
+      "fit_ready": 3
+    },
+    "dna_rendering": {
+      "cases": 8,
+      "evaluation_ready": 8,
+      "fit_ready": 8
+    }
+  },
+  "cases": {
+    "actorshq_actor01_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "actorshq_actor01_seq2": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor02_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "actorshq_actor02_seq2": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor04_seq2": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "actorshq_actor05_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor06_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor06_seq2": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor07_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "actorshq_actor08_seq1": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": false,
+        "pose_annotations": true
+      },
+      "dataset": "actorshq",
+      "evaluation_ready": false,
+      "fit_ready": false
+    },
+    "dna_0012_11": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0013_01": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0013_03": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0013_09": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0013_11": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0019_08": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0021_03": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    },
+    "dna_0023_06": {
+      "assets": {
+        "evaluation_metadata": true,
+        "params": true,
+        "pose_annotations": true
+      },
+      "dataset": "dna_rendering",
+      "evaluation_ready": true,
+      "fit_ready": true
+    }
+  },
+  "reproduction_id": "dressrecon_bob_recompute_availability",
+  "schema_version": 1,
+  "scope": "Current raw assets needed for recomputation; independent of the complete checked-in result evidence."
+}

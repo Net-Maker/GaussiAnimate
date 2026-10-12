@@ -1,0 +1,23 @@
+include README.md LICENSE THIRD_PARTY_NOTICES.md pyproject.toml
+include .gitignore
+recursive-include assets *.jpg
+recursive-include skelebone *.py *.png *.gif
+recursive-include partmm *.py *.md *.png *.gif
+recursive-include experiments *.py *.yaml *.md
+recursive-include experiments/reproductions/results *.json
+include experiments/reproductions/dressrecon_bob/LICENSE
+recursive-include experiments/multiview_gaussian/diagnostics *.json *.npy *.png
+recursive-include native *.h *.cpp *.txt *.cmake *.in *.py *.toml *.sh LICENSE
+recursive-include scripts *.py *.sh
+recursive-include tests *.py
+recursive-include docs *.md
+recursive-include .github *.yml
+prune experiments/runs
+prune .research
+prune .native
+prune outputs
+prune build
+prune dist
+prune native/pyssdr/build
+prune native/curve_skeleton/build
+global-exclude __pycache__ *.py[cod] *.so

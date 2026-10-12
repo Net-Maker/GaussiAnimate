@@ -1,0 +1,191 @@
+schema_version: 2
+experiment:
+  id: monocular_novel_view
+  target_id: synthetic_novel_view
+  title: Synthetic novel-view reconstruction
+  paper_target: Table 2 / unseen-view synthetic reconstruction
+  seed: 42
+output_dir: ../runs/monocular_novel_view
+datasets:
+  - id: dnerf
+    label: D-NeRF
+    cases:
+      - hellwarrior
+      - hook
+      - jumpingjacks
+      - mutant
+      - standup
+      - trex
+  - id: dgmesh
+    label: DG-Mesh
+    cases:
+      - beagle
+      - bird
+      - duck
+      - girlwalk
+      - horse
+methods:
+  - id: ours
+    label: GaussiAnimate
+    mode: external
+    datasets: [dnerf, dgmesh]
+    stages:
+      - id: train
+        type: command
+        resources: {gpu: true}
+        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - train_gui.py
+          - --source_path
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - --model_path
+          - "{run_dir}/model"
+          - --deform_type
+          - node
+          - --node_num
+          - 512
+          - --is_blender
+          - --eval
+          - --gt_alpha_mask_as_scene_mask
+          - --local_frame
+          - --resolution
+          - 2
+          - --iterations
+          - 40000
+          - --iterations_node_rendering
+          - 10000
+          - --use_isotropic_gs
+        inputs:
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+        outputs:
+          - "{run_dir}/model_node/cfg_args"
+      - id: render
+        type: command
+        resources: {gpu: true}
+        cwd: ${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}
+        command:
+          - ${GA_MONOCULAR_PYTHON:-~/anaconda3/envs/riggs/bin/python}
+          - render.py
+          - --source_path
+          - "${GA_MONOCULAR_ROOT:-~/research/GA/RigGS}/data/dy_syn_data/{case.id}"
+          - --model_path
+          - "{run_dir}/model"
+          - --deform_type
+          - node
+          - --node_num
+          - 512
+          - --is_blender
+          - --eval
+          - --gt_alpha_mask_as_scene_mask
+          - --local_frame
+          - --resolution
+          - 2
+          - --W
+          - 800
+          - --H
+          - 800
+          - --use_isotropic_gs
+          - --iteration
+          - 40000
+        inputs:
+          - "{run_dir}/model_node/cfg_args"
+        outputs:
+          - "{run_dir}/model_node/test/ours_40000/renders"
+          - "{run_dir}/model_node/test/ours_40000/gt"
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: "{run_dir}/model_node/test/ours_40000/renders"
+        reference_dir: "{run_dir}/model_node/test/ours_40000/gt"
+        metrics: [psnr, ssim, lpips]
+        lpips_network: vgg
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - "{run_dir}/model_node/test/ours_40000/renders"
+          - "{run_dir}/model_node/test/ours_40000/gt"
+        outputs:
+          - "{run_dir}/image_metrics.json"
+  - id: dnerf
+    label: D-NeRF
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/dnerf/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/dnerf/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/dnerf/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/dnerf/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: tineuvox
+    label: TiNeuVox
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/tineuvox/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/tineuvox/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/tineuvox/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/tineuvox/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: 4dgs
+    label: 4D-GS
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/4dgs/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/4dgs/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/4dgs/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/4dgs/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: scgs
+    label: SC-GS
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/scgs/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/scgs/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/scgs/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/scgs/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: apnerf
+    label: AP-NeRF
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/apnerf/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/apnerf/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/apnerf/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/apnerf/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
+  - id: riggs
+    label: RigGS
+    mode: artifact
+    stages:
+      - id: evaluate
+        type: image_metrics
+        prediction_dir: ${GA_BASELINE_RENDER_ROOT}/riggs/{dataset.id}/{case.id}/renders
+        reference_dir: ${GA_BASELINE_RENDER_ROOT}/riggs/{dataset.id}/{case.id}/gt
+        metrics: [psnr, ssim, lpips]
+        output: "{run_dir}/image_metrics.json"
+        inputs:
+          - ${GA_BASELINE_RENDER_ROOT}/riggs/{dataset.id}/{case.id}/renders
+          - ${GA_BASELINE_RENDER_ROOT}/riggs/{dataset.id}/{case.id}/gt
+        outputs: ["{run_dir}/image_metrics.json"]
