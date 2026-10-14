@@ -64,6 +64,9 @@ class ExtractionConfig:
     joint_peak_window_hops: int = 8
     joint_max_count: Optional[int] = None
     joint_track_neighbors: int = 20
+    joint_ik_iterations: int = 200
+    joint_ik_tolerance: float = 1e-8
+    joint_surface_constraints: bool = True
 
     def __post_init__(self) -> None:
         if self.mesh_frame is not None and self.mesh_frame != self.rest_frame:
@@ -148,6 +151,9 @@ class SkelebonePipeline:
         tracking = TrackingConfig(
             rest_frame=config.rest_frame,
             neighbors=config.joint_track_neighbors,
+            ik_iterations=config.joint_ik_iterations,
+            ik_tolerance=config.joint_ik_tolerance,
+            surface_constraints=config.joint_surface_constraints,
         )
         if config.skinning_transfer_neighbors < 1:
             raise ValueError("skinning_transfer_neighbors must be positive")

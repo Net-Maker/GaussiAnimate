@@ -128,18 +128,23 @@ def fit_pose_to_joint_positions(
     skeleton: Skeleton,
     joint_positions: np.ndarray,
     fps: float = 30.0,
+    *,
+    max_iterations: int = 200,
+    tolerance: float = 1e-8,
 ) -> PoseSequence:
     """Fit an interpretable local-rotation sequence to tracked joint positions.
 
     Each joint orientation is estimated from its outgoing rest/observed bone
     directions. Branch joints use Kabsch; single-child joints use the minimum
-    vector-alignment rotation. This gives a deterministic FK/BVH initialization
-    that can subsequently be refined by the paper's IK objective.
+    vector-alignment rotation. Global positional IK then refines this seed
+    while preserving the bind bone lengths and hierarchy.
     """
     positions = np.asarray(joint_positions, dtype=np.float64)
     expected_tail = (skeleton.num_joints, 3)
     if positions.ndim != 3 or positions.shape[1:] != expected_tail:
         raise ValueError(f"joint_positions must have shape [frames, {expected_tail[0]}, 3]")
+    if not len(positions) or not np.all(np.isfinite(positions)):
+        raise ValueError("joint_positions must contain finite, nonempty frames")
     children = [[] for _ in range(skeleton.num_joints)]
     for child, parent in enumerate(skeleton.parents):
         if parent >= 0:
@@ -176,4 +181,79 @@ def fit_pose_to_joint_positions(
             local_rotation[:, joint] = np.swapaxes(global_rotation[:, parent], -1, -2) @ global_rotation[:, joint]
     root = int(skeleton.roots[0])
     translation = positions[:, root] - skeleton.rest_joints[root]
-    return PoseSequence(matrix_to_quaternion(local_rotation), translation, fps=fps)
+    initial = PoseSequence(matrix_to_quaternion(local_rotation), translation, fps=fps)
+    return refine_pose_to_joint_positions(
+        skeleton, positions, initial,
+        max_iterations=max_iterations, tolerance=tolerance,
+    )
+
+
+def refine_pose_to_joint_positions(
+    skeleton: Skeleton,
+    joint_positions: np.ndarray,
+    initial: PoseSequence,
+    *,
+    position_weights=None,
+    max_iterations: int = 200,
+    tolerance: float = 1e-8,
+) -> PoseSequence:
+    """Minimize weighted world-space joint error using rigid subtree updates."""
+    if not isinstance(max_iterations, (int, np.integer)) or max_iterations < 0:
+        raise ValueError("max_iterations must be a non-negative integer")
+    if not np.isfinite(tolerance) or tolerance <= 0:
+        raise ValueError("tolerance must be finite and positive")
+    target = np.asarray(joint_positions, dtype=np.float64)
+    if target.shape != (initial.num_frames, skeleton.num_joints, 3) or not np.all(np.isfinite(target)):
+        raise ValueError("joint_positions must match the finite initial pose")
+    weights = np.ones(target.shape[:2]) if position_weights is None else np.asarray(position_weights, dtype=np.float64)
+    if weights.shape != target.shape[:2] or not np.all(np.isfinite(weights)) or np.any(weights <= 0):
+        raise ValueError("position_weights must be finite positive [frames,joints] weights")
+    transforms, positions = forward_kinematics(skeleton, initial)
+    positions = positions.copy()
+    rotations = transforms[..., :3, :3].copy()
+    order = hierarchy_order(skeleton.parents)
+    descendants = [[] for _ in order]
+    for child in order:
+        parent = int(skeleton.parents[child])
+        while parent >= 0:
+            descendants[parent].append(child)
+            parent = int(skeleton.parents[parent])
+    scale_squared = max(float(np.sum(skeleton.offsets[skeleton.parents >= 0] ** 2)), np.finfo(float).tiny)
+    loss = np.sum(weights[..., None] * (positions - target) ** 2, axis=(1, 2)) / weights.sum(axis=1)
+    for _ in range(max_iterations):
+        previous = loss
+        for joint in reversed(order):
+            ids = descendants[joint]
+            if not ids:
+                continue
+            pivot = positions[:, joint:joint + 1]
+            source = positions[:, ids] - pivot
+            destination = target[:, ids] - pivot
+            covariance = np.einsum("tn,tni,tnj->tij", weights[:, ids], source, destination)
+            # Prefer the smallest update when collinear descendants leave twist unobservable.
+            ridge = np.sum(weights[:, ids, None] * source ** 2, axis=(1, 2)) * 1e-10
+            covariance += ridge[:, None, None] * np.eye(3)
+            left, _, right_t = np.linalg.svd(covariance)
+            update = np.swapaxes(right_t, -1, -2) @ np.swapaxes(left, -1, -2)
+            right_t[:, -1] *= np.where(np.linalg.det(update) < 0, -1., 1.)[:, None]
+            update = np.swapaxes(right_t, -1, -2) @ np.swapaxes(left, -1, -2)
+            candidate = np.einsum("tij,tnj->tni", update, source) + pivot
+            before = np.sum(weights[:, ids, None] * (positions[:, ids] - target[:, ids]) ** 2, axis=(1, 2))
+            after = np.sum(weights[:, ids, None] * (candidate - target[:, ids]) ** 2, axis=(1, 2))
+            update[after >= before] = np.eye(3)
+            positions[:, ids] = np.einsum("tij,tnj->tni", update, source) + pivot
+            affected = [joint] + ids
+            rotations[:, affected] = update[:, None] @ rotations[:, affected]
+        positions += np.sum(weights[..., None] * (target - positions), axis=1, keepdims=True) / weights.sum(axis=1)[:, None, None]
+        loss = np.sum(weights[..., None] * (positions - target) ** 2, axis=(1, 2)) / weights.sum(axis=1)
+        if np.max(previous - loss) <= tolerance * scale_squared:
+            break
+    local = rotations.copy()
+    for joint in order:
+        parent = int(skeleton.parents[joint])
+        if parent >= 0:
+            local[:, joint] = np.swapaxes(rotations[:, parent], -1, -2) @ rotations[:, joint]
+    root = int(skeleton.roots[0])
+    return PoseSequence(
+        matrix_to_quaternion(local), positions[:, root] - skeleton.rest_joints[root], fps=initial.fps,
+    )
