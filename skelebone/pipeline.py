@@ -282,6 +282,7 @@ class SkelebonePipeline:
             source_points=ssdr.rest_pose,
             motion=tracked.motion,
             bone_transforms=ssdr.transformations,
+            point_attributes=sequence.point_attributes,
             artifacts={
                 "ssdr": relative(ssdr_path),
                 "mesh": relative(curve.mesh_path),

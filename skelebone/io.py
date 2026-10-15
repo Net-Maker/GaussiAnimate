@@ -9,6 +9,18 @@ from .types import DynamicPointSequence, PoseSequence, Skeleton, SkeleboneBundle
 
 
 POINT_SEQUENCE_SCHEMA_VERSION = 1
+_POINT_ATTRIBUTE_PREFIX = "point_attribute_"
+
+
+def _read_point_attributes(data):
+    attributes = {
+        key[len(_POINT_ATTRIBUTE_PREFIX):]: data[key]
+        for key in data.files if key.startswith(_POINT_ATTRIBUTE_PREFIX)
+    }
+    for key in ("source_indices", "colors", "opacity", "scales", "rotations", "sh_dc", "sh_rest"):
+        if key in data and key not in attributes:
+            attributes[key] = data[key]
+    return attributes
 
 
 def load_point_sequence(path, fps: float = 30.0) -> DynamicPointSequence:
@@ -24,7 +36,10 @@ def load_point_sequence(path, fps: float = 30.0) -> DynamicPointSequence:
             raise ValueError("NPZ must contain 'points'")
         faces = data["faces"] if "faces" in data else None
         stored_fps = float(data["fps"]) if "fps" in data else fps
-        return DynamicPointSequence(data["points"], faces=faces, fps=stored_fps)
+        return DynamicPointSequence(
+            data["points"], faces=faces, fps=stored_fps,
+            point_attributes=_read_point_attributes(data),
+        )
 
 
 def save_point_sequence(path, points, faces=None, fps: float = 30.0) -> Path:
@@ -46,6 +61,7 @@ def save_point_sequence(path, points, faces=None, fps: float = 30.0) -> Path:
     }
     if sequence.faces is not None:
         arrays["faces"] = sequence.faces
+    arrays.update({_POINT_ATTRIBUTE_PREFIX + key: value for key, value in sequence.point_attributes.items()})
     np.savez_compressed(path, **arrays)
     return path
 
@@ -84,6 +100,7 @@ def save_bundle(path, bundle: SkeleboneBundle) -> Path:
         )
     if bundle.bone_transforms is not None:
         arrays["bone_transforms"] = bundle.bone_transforms
+    arrays.update({_POINT_ATTRIBUTE_PREFIX + key: value for key, value in bundle.point_attributes.items()})
     np.savez_compressed(path, **arrays)
     return path
 
@@ -105,6 +122,7 @@ def load_bundle(path) -> SkeleboneBundle:
             motion=motion,
             bone_transforms=bone_transforms,
             artifacts=artifacts,
+            point_attributes=_read_point_attributes(data),
         )
 
 

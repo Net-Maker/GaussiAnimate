@@ -6,6 +6,8 @@ from typing import Optional
 
 import numpy as np
 
+from skelebone.pointcloud import frame_sort_key
+
 
 def _load_frame(path: Path) -> np.ndarray:
     if path.suffix.lower() == ".npy":
@@ -42,7 +44,7 @@ def export_riggs_points(
     if fps <= 0:
         raise ValueError("fps must be positive")
     directory = Path(frame_dir)
-    files = sorted(directory.glob(pattern))
+    files = sorted(directory.glob(pattern), key=frame_sort_key)
     if not files:
         raise ValueError(f"no frames matching {pattern!r} under {directory}")
     frames = [_load_frame(path) for path in files]

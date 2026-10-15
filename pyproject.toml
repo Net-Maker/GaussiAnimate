@@ -75,6 +75,7 @@ dev = ["pytest>=7,<9", "build>=1,<2"]
 gaussianimate = "skelebone.__main__:main"
 gaussianimate-animate = "partmm.__main__:main"
 gaussianimate-edit = "partmm.gui:main"
+gaussianimate-view = "skelebone.animation_tool.server:main"
 gaussianimate-experiment = "experiments.run:main"
 gaussianimate-paper = "experiments.paper:main"
 gaussianimate-paper-audit = "experiments.audit:main"
@@ -101,7 +102,8 @@ namespaces = false
 
 [tool.setuptools.package-data]
 partmm = ["README.md", "examples/*.png", "examples/*.gif"]
-skelebone = ["examples/*.png", "examples/*.gif"]
+skelebone = ["README.md", "examples/*.png", "examples/*.gif"]
+"skelebone.animation_tool" = ["web/*.html", "web/*.js", "web/*.css"]
 # Explicit per-tree allowlist: local run outputs (experiments/runs) and
 # diagnostics artifacts must never match a packaging pattern.
 experiments = [

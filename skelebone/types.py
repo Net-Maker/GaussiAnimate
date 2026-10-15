@@ -14,6 +14,20 @@ def _float_array(value, name: str) -> np.ndarray:
     return array
 
 
+def _point_attributes(attributes, count):
+    result = {}
+    for name, value in attributes.items():
+        if not isinstance(name, str) or not name.isidentifier():
+            raise ValueError("point attribute names must be identifiers")
+        array = np.asarray(value)
+        if array.ndim < 1 or array.shape[0] != count:
+            raise ValueError(f"point attribute {name} must have {count} rows")
+        if array.dtype.kind not in "biuf" or not np.all(np.isfinite(array)):
+            raise ValueError(f"point attribute {name} must contain finite numeric values")
+        result[name] = array
+    return result
+
+
 @dataclass
 class DynamicPointSequence:
     """A temporally registered point sequence with shape ``[T, N, 3]``."""
@@ -21,6 +35,7 @@ class DynamicPointSequence:
     points: np.ndarray
     faces: Optional[np.ndarray] = None
     fps: float = 30.0
+    point_attributes: Dict[str, np.ndarray] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.points = _float_array(self.points, "points")
@@ -36,6 +51,7 @@ class DynamicPointSequence:
                 raise ValueError("faces must have shape [triangles, 3]")
             if self.faces.size and (self.faces.min() < 0 or self.faces.max() >= self.points.shape[1]):
                 raise ValueError("faces contain an out-of-range vertex index")
+        self.point_attributes = _point_attributes(self.point_attributes, self.num_points)
 
     @property
     def num_frames(self) -> int:
@@ -153,6 +169,7 @@ class SkeleboneBundle:
     motion: Optional[PoseSequence] = None
     bone_transforms: Optional[np.ndarray] = None
     artifacts: Dict[str, str] = field(default_factory=dict)
+    point_attributes: Dict[str, np.ndarray] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.weights = _float_array(self.weights, "weights")
@@ -179,6 +196,7 @@ class SkeleboneBundle:
             if self.motion is None or self.bone_transforms.shape[0] != self.motion.num_frames:
                 raise ValueError("bone transforms require a same-length source motion")
         self.artifacts = {str(key): str(Path(value)) for key, value in self.artifacts.items()}
+        self.point_attributes = _point_attributes(self.point_attributes, len(self.source_points))
 
     @property
     def num_bones(self) -> int:

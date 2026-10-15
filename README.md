@@ -30,6 +30,7 @@ There are two ways into this repository. Most users only need the first one.
 | I want to... | Start with |
 | --- | --- |
 | Rig my own registered point sequence | [Quick start](#quick-start) |
+| Animate Gaussians or point clouds | [Import, extract, and interact](skelebone/README.md) |
 | Understand the representation | [What is a skelebone?](#what-is-a-skelebone) |
 | Call the library from Python | [Python API](#python-api) |
 | Transfer a new motion | [Animate with PartMM](#animate-with-partmm) |
@@ -223,8 +224,9 @@ controls such as `--joint-merge-distance 0.08`. Normalize unusually large or
 small assets, or tune the distance parameters for their scale.
 
 For Gaussian inputs, `points` is typically the time series of Gaussian means.
-Colors, opacity, covariance, and rotations are not part of the core input
-contract; experiment adapters may keep them for rendering and evaluation.
+Optional per-point colors, opacity, scales, rotations, SH coefficients, and
+source IDs are retained in `point_attributes`; extraction operates on means.
+See the [Gaussian and point-cloud guide](skelebone/README.md).
 
 ## Output Contract
 

@@ -90,6 +90,73 @@ def nearest_frame_index(frame_fids: Sequence[float], fid: float) -> int:
     return int(np.abs(values - float(fid)).argmin())
 
 
+def sample_transforms_at_fid(
+    transforms: np.ndarray,
+    frame_fids: Sequence[float],
+    fid: float,
+) -> np.ndarray:
+    """Sample [T, B, 4, 4] rigid bone transforms at an arbitrary scalar fid.
+
+    Translations are linearly interpolated; rotations follow the shortest
+    path via quaternion SLERP. Queries outside the fid range are clamped to
+    the endpoints. Returns float32 transforms of shape [B, 4, 4] with a
+    valid affine last row.
+    """
+    from partmm.transforms import (
+        quaternion_slerp,
+        quaternion_to_matrix,
+        rotation_matrix_to_quaternion,
+    )
+
+    fids = np.asarray(frame_fids, dtype=np.float64).reshape(-1)
+    if fids.size == 0:
+        raise ValueError("frame_fids must be non-empty")
+    if not np.isfinite(fids).all():
+        raise ValueError("frame_fids must be finite")
+    if fids.size > 1 and np.any(np.diff(fids) <= 0.0):
+        raise ValueError("frame_fids must be strictly increasing")
+    transforms = np.asarray(transforms, dtype=np.float64)
+    if (
+        transforms.ndim != 4
+        or transforms.shape[0] != fids.size
+        or transforms.shape[2:] != (4, 4)
+    ):
+        raise ValueError(
+            "transforms must have shape [len(frame_fids), bones, 4, 4]"
+        )
+    fid = float(fid)
+    if not np.isfinite(fid):
+        raise ValueError("fid must be finite")
+
+    if fids.size == 1:
+        lo = hi = 0
+        alpha = 0.0
+    else:
+        fid = min(max(fid, fids[0]), fids[-1])
+        lo = min(
+            max(int(np.searchsorted(fids, fid, side="right")) - 1, 0),
+            fids.size - 2,
+        )
+        hi = lo + 1
+        alpha = (fid - fids[lo]) / (fids[hi] - fids[lo])
+
+    translations = (1.0 - alpha) * transforms[lo, :, :3, 3] + alpha * transforms[
+        hi, :, :3, 3
+    ]
+    quaternions_start = rotation_matrix_to_quaternion(transforms[lo, :, :3, :3])
+    quaternions_end = rotation_matrix_to_quaternion(transforms[hi, :, :3, :3])
+    rotations = np.empty((transforms.shape[1], 3, 3), dtype=np.float64)
+    for bone in range(transforms.shape[1]):
+        blended = quaternion_slerp(
+            quaternions_start[bone], quaternions_end[bone], np.asarray([alpha])
+        )
+        rotations[bone] = quaternion_to_matrix(blended)[0]
+    result = np.broadcast_to(np.eye(4), (transforms.shape[1], 4, 4)).copy()
+    result[:, :3, :3] = rotations
+    result[:, :3, 3] = translations
+    return result.astype(np.float32)
+
+
 def deformation_attributes_for_render(
     rotation: Any,
     scaling: Any,
@@ -177,9 +244,9 @@ def _load_models(
     source_path: Optional[Path] = None,
 ):
     _activate_riggs(riggs_root)
-    from .riggs_loader import load_base_models
+    from .riggs_loader import complete_model_config, load_base_models
 
-    dataset = _parse_saved_namespace(model_path / "cfg_args")
+    dataset = complete_model_config(_parse_saved_namespace(model_path / "cfg_args"))
     dataset.model_path = str(model_path.resolve())
     dataset.source_path = str(
         Path(source_path if source_path is not None else dataset.source_path)
@@ -361,9 +428,7 @@ def render_and_evaluate(
         ],
         dim=1,
     )
-    transforms_torch = torch.from_numpy(
-        np.asarray(ssdr["transformations"], dtype=np.float32)
-    ).to(xyz.device)
+    transforms_numpy = np.asarray(ssdr["transformations"], dtype=np.float32)
     metric_values = {"psnr": [], "ssim": [], "lpips": []}
     frame_records = []
     views = ordered_unique_views(models.scene.getTestCameras())
@@ -384,12 +449,11 @@ def render_and_evaluate(
                 motion_mask=gaussian.motion_mask,
                 is_training=False,
             )
-            transformed = torch.einsum(
-                "bij,nj->bni", transforms_torch[frame_index], rest_h
-            )
-            ssdr_xyz = torch.einsum(
-                "bn,bni->ni", weights_torch, transformed[..., :3]
-            )
+            transforms_fid = torch.from_numpy(
+                sample_transforms_at_fid(transforms_numpy, frame_fids, fid)
+            ).to(device=xyz.device, dtype=xyz.dtype)
+            affine = torch.einsum("bn,bij->nij", weights_torch, transforms_fid[:, :3, :])
+            ssdr_xyz = torch.einsum("nij,nj->ni", affine, rest_h)
             d_xyz = ssdr_xyz - xyz
             d_rotation, d_scaling = deformation_attributes_for_render(
                 values["d_rotation"],

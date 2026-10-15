@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Skelebone Studio</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <strong>Skelebone Studio</strong>
+      <select id="scene-select" aria-label="Asset"></select>
+      <label class="check"
+        ><input type="checkbox" id="reference-check" />Reference motion</label
+      >
+      <a
+        id="export-link"
+        class="button"
+        aria-disabled="true"
+        title="Export resolved pose"
+        ><i data-lucide="download"></i><span>Export pose</span></a
+      >
+    </header>
+    <main>
+      <section id="stage-wrap">
+        <canvas id="stage" aria-label="Editable asset"></canvas>
+        <div class="viewport-label">
+          Asset <span id="pose-status">Loading</span>
+        </div>
+        <section id="reference-panel" hidden>
+          <div class="reference-title">Reference motion</div>
+          <canvas
+            id="reference-stage"
+            aria-label="Reference motion viewport"
+          ></canvas>
+          <div class="reference-controls">
+            <button
+              id="play-btn"
+              title="Play reference"
+              aria-label="Play reference"
+            >
+              <i data-lucide="play"></i>
+            </button>
+            <input
+              id="timeline"
+              type="range"
+              min="0"
+              max="0"
+              value="0"
+              aria-label="Reference frame"
+            />
+            <output id="frame-label">1 / 1</output>
+          </div>
+        </section>
+      </section>
+      <aside aria-label="Pose controls">
+        <section>
+          <h2>Pose</h2>
+          <label for="driver-mode">Driver</label>
+          <select id="driver-mode">
+            <option value="auto">Auto</option>
+            <option value="lbs">LBS</option>
+          </select>
+          <label for="joint-select">Joint</label>
+          <select id="joint-select"></select>
+          <div class="angle">
+            <label for="rot-x">X</label
+            ><input
+              id="rot-x"
+              type="range"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="X rotation"
+            /><input
+              id="rot-x-num"
+              type="number"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="X angle"
+            />
+          </div>
+          <div class="angle">
+            <label for="rot-y">Y</label
+            ><input
+              id="rot-y"
+              type="range"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="Y rotation"
+            /><input
+              id="rot-y-num"
+              type="number"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="Y angle"
+            />
+          </div>
+          <div class="angle">
+            <label for="rot-z">Z</label
+            ><input
+              id="rot-z"
+              type="range"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="Z rotation"
+            /><input
+              id="rot-z-num"
+              type="number"
+              min="-180"
+              max="180"
+              value="0"
+              step="1"
+              aria-label="Z angle"
+            />
+          </div>
+          <button
+            id="reset-pose-btn"
+            class="text-button"
+            title="Reset all joint rotations"
+          >
+            <i data-lucide="undo-2"></i>Reset pose
+          </button>
+        </section>
+        <section>
+          <h2>View</h2>
+          <label class="check"
+            ><input
+              id="skeleton-check"
+              type="checkbox"
+              checked
+            />Skeleton</label
+          >
+          <label for="color-mode">Color</label
+          ><select id="color-mode">
+            <option value="appearance">Appearance</option>
+            <option value="skinning">Blending weights</option>
+          </select>
+          <label for="point-size"
+            >Point size <output id="point-size-out">2</output></label
+          ><input
+            id="point-size"
+            type="range"
+            min="1"
+            max="6"
+            value="2"
+            step="0.25"
+          />
+          <label for="up-axis">Up axis</label
+          ><select id="up-axis">
+            <option value="y">Y</option>
+            <option value="z">Z</option>
+          </select>
+          <button
+            id="reset-view-btn"
+            class="text-button"
+            title="Fit asset in view"
+          >
+            <i data-lucide="focus"></i>Fit view
+          </button>
+        </section>
+      </aside>
+    </main>
+    <footer>
+      <span id="status" role="status">Loading assets</span
+      ><span id="stats"></span>
+    </footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ CUDA extensions are installed separately; no private model loader is needed.
 """
 
 from dataclasses import dataclass
+from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,23 @@ class Reconstruction:
     background: Any
 
 
+def complete_model_config(dataset):
+    """Restore omitted engine defaults without overwriting saved settings."""
+    from arguments import ModelParams
+
+    parser = ArgumentParser(add_help=False)
+    ModelParams(parser)
+    values = vars(parser.parse_args([]))
+    saved = vars(dataset)
+    if "deform_type" not in saved and "is_6dof" in saved:
+        if saved["is_6dof"]:
+            raise ValueError("legacy 6-DoF checkpoints require their original exporter")
+        # The original D-NeRF MLP predates node deformation and feature vectors.
+        values.update(deform_type="mlp", hyper_dim=0)
+    values.update(saved)
+    return Namespace(**values)
+
+
 def load_base_models(dataset, iteration=-1, shuffle=False):
     import torch
     from gaussian_renderer import GaussianModel
@@ -34,7 +52,8 @@ def load_base_models(dataset, iteration=-1, shuffle=False):
     )
     options = {name: getattr(dataset, name) for name in deformation_fields}
     deform = DeformModel(**options)
-    deform.load_weights(dataset.model_path, iteration=iteration)
+    if not deform.load_weights(dataset.model_path, iteration=iteration):
+        raise FileNotFoundError(f"no deformation checkpoint at iteration {iteration}: {dataset.model_path}")
     feature_dimension = (
         deform.deform.node_num
         if dataset.skinning and deform.name == "node"

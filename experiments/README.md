@@ -103,6 +103,12 @@ Set `GA_HORSE_RECONSTRUCTION` to the resulting `model_node` directory for
 the SSDR command above. This training command alone evaluates reconstruction,
 not the SSDR result.
 
+### Interactive Synthetic Animation
+
+For Gaussian trajectory export, Skelebone extraction, and interactive PartMM
+driving, follow the [point-cloud animation guide](../skelebone/README.md).
+The six-scene protocol is in [skelebone.yaml](monocular_gaussian/skelebone.yaml).
+
 ## Table 3: Human Novel-Pose Rendering
 
 ```bash

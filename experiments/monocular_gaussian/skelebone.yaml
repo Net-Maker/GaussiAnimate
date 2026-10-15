@@ -1,0 +1,43 @@
+# Reproducible skelebone extraction + PartMM animation over monocular
+# GaussianAnimator point tracks. Roots are expanded recursively from the
+# environment (${$GA_VAR} style) when the config is loaded; both must be set.
+#
+# Scene scope: exactly these six scenes (lego and bouncingballs are excluded
+# by request). Extraction runs also need a curve_skeleton binary; the skelebone
+# pipeline resolves it from GA_CURVE_SKELETON_BIN, PATH, or the repository
+# .native/bin directory.
+schema_version: 1
+
+seed: 42
+fps: 30.0
+max_points: 12000
+min_opacity: 0.05
+pointcloud_pattern: pointcloud_t*.ply
+
+paths:
+  point_track_root: ${GA_POINT_TRACK_ROOT}
+  output_root: ${GA_OUTPUT_ROOT}
+  folder_pattern: dnerf_{case}_gaussiananimator
+
+# Forwarded to skelebone.ExtractionConfig. max_normalized_rmse is enforced by
+# the runner: SSDR rmse (sqrt of mean squared coordinate error) normalized by
+# the rest-point bounding-box diagonal must not exceed it.
+extraction:
+  num_bones: 50
+  ssdr_max_iterations: 50
+  mesh_poisson_depth: 8
+  mesh_target_triangles: 8000
+  max_normalized_rmse: 0.05
+
+# Novel edit: deterministic sinusoidal rotation of one non-root, non-leaf
+# joint with this peak amplitude (degrees), one cycle over the clip.
+animation:
+  amplitude_deg: 15.0
+
+scenes:
+  - hellwarrior
+  - hook
+  - jumpingjacks
+  - mutant
+  - standup
+  - trex

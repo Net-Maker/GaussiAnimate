@@ -204,8 +204,12 @@ def linear_blend_skinning(rest_pose, weights, transformations) -> np.ndarray:
     if len(rest_pose) != len(weights):
         raise ValueError("rest_pose and weights point counts differ")
     homogeneous = np.concatenate([rest_pose, np.ones((len(rest_pose), 1))], axis=1)
-    transformed = np.einsum("tbij,nj->tbni", transforms, homogeneous)[..., :3]
-    return np.einsum("nb,tbni->tni", weights, transformed)
+    output = np.empty((len(transforms), len(rest_pose), 3), dtype=np.float64)
+    # Blend affine maps before applying them; never allocate [frames,bones,points].
+    for frame, matrices in enumerate(transforms):
+        blended = weights @ matrices[:, :3, :].reshape(weights.shape[1], 12)
+        output[frame] = np.einsum("nij,nj->ni", blended.reshape(-1, 3, 4), homogeneous)
+    return output
 
 
 def bone_position_sequence(transformations, weights, rest_pose) -> np.ndarray:
