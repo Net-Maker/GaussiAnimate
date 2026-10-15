@@ -19,6 +19,9 @@ checkpoint that produced the trajectories, in exactly the same row order.
 
 ## Extract and Animate
 
+For Gaussians, [export a TSDF mesh](#start-from-a-monocular-checkpoint) and
+append `--mesh /path/to/canonical_mesh.ply` to the extraction command.
+
 ```bash
 gaussianimate outputs/my_asset/sequence.npz outputs/my_asset/result --num-bones 50
 gaussianimate-view outputs/my_asset/result/skelebones.npz \
@@ -42,11 +45,14 @@ Export a trained checkpoint using the
 python -m experiments.monocular_gaussian.export /path/to/model \
   /path/to/tracks/dnerf_trex_gaussiananimator \
   --source-path /path/to/dnerf/trex --iteration 40000
+python -m experiments.monocular_gaussian.tsdf /path/to/model \
+  /path/to/tracks/dnerf_trex_gaussiananimator/canonical_mesh.ply \
+  --source-path /path/to/dnerf/trex --iteration 40000 --fid 0
 ```
 
-This writes registered PLY frames. For the six configured D-NeRF sequences,
-export each checkpoint into the corresponding `dnerf_<scene>_gaussiananimator`
-directory, then run:
+Install `open3d>=0.19,<0.20` in the monocular environment for TSDF fusion.
+For each configured D-NeRF sequence, export both the registered frames and
+TSDF mesh into `dnerf_<scene>_gaussiananimator`, then run:
 
 ```bash
 export GA_POINT_TRACK_ROOT=/path/to/tracks

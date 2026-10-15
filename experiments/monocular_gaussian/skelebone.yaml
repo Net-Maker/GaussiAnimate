@@ -19,6 +19,10 @@ paths:
   output_root: ${GA_OUTPUT_ROOT}
   folder_pattern: dnerf_{case}_gaussiananimator
 
+mesh:
+  method: tsdf
+  filename: canonical_mesh.ply
+
 # Forwarded to skelebone.ExtractionConfig. max_normalized_rmse is enforced by
 # the runner: SSDR rmse (sqrt of mean squared coordinate error) normalized by
 # the rest-point bounding-box diagonal must not exceed it.

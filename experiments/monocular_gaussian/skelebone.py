@@ -110,6 +110,11 @@ def _expand_env(value):
 
 
 def _validate_config(config):
+    mesh = config.get("mesh", {})
+    if mesh.get("method", "poisson") not in ("tsdf", "poisson"):
+        raise RunnerError("mesh.method must be tsdf or poisson")
+    if mesh.get("method") == "tsdf" and not mesh.get("filename"):
+        raise RunnerError("mesh.filename is required for TSDF extraction")
     scenes = config.get("scenes")
     if (
         not isinstance(scenes, list)
@@ -418,6 +423,19 @@ def _extract_info(bundle, raw_rmse, config):
     }
 
 
+def _canonical_mesh(config, input_dir):
+    settings = config.get("mesh", {})
+    if settings.get("method", "poisson") == "poisson":
+        return None
+    path = Path(input_dir) / settings["filename"]
+    if not path.is_file():
+        raise RunnerError(
+            f"missing TSDF mesh {path}; export it with "
+            "python -m experiments.monocular_gaussian.tsdf MODEL OUTPUT"
+        )
+    return path
+
+
 def run_extract(config, case, input_dir, output_dir, force):
     """Stage 2: extract the skelebone rig into ``result/skelebones.npz``."""
     sequence_path = output_dir / "sequence.npz"
@@ -426,13 +444,26 @@ def run_extract(config, case, input_dir, output_dir, force):
     manifest_path = result_dir / "manifest.json"
     if not sequence_path.is_file():
         raise RunnerError(f"missing {sequence_path}; run the prepare stage first")
+    mesh = _canonical_mesh(config, input_dir)
     if bundle_path.is_file() and manifest_path.is_file() and not force:
+        if mesh is not None:
+            surface = json.loads(manifest_path.read_text()).get("surface", {})
+            if (surface.get("source") != "tsdf"
+                    or surface.get("canonical_mesh") != str(mesh.resolve())
+                    or mesh.stat().st_mtime_ns > bundle_path.stat().st_mtime_ns):
+                raise RunnerError("cached rig does not match the TSDF mesh; use a new output root or --force")
         bundle = load_bundle(bundle_path)
         return _extract_info(bundle, _extract_rmse(manifest_path), config)
     sequence = load_point_sequence(sequence_path)
     settings = {key: config["extraction"][key] for key in EXTRACTION_FIELDS}
     pipeline = SkelebonePipeline(ExtractionConfig(**settings))
-    result = pipeline.run(sequence, result_dir)
+    if mesh is None:
+        result = pipeline.run(sequence, result_dir)
+    else:
+        result = pipeline.run(sequence, result_dir, mesh_for_skeleton=mesh)
+        manifest = json.loads(result.manifest_path.read_text())
+        manifest["surface"].update(source="tsdf", canonical_mesh=str(mesh.resolve()))
+        _write_json(result.manifest_path, manifest)
     return _extract_info(result.bundle, _extract_rmse(result.manifest_path), config)
 
 
@@ -548,6 +579,7 @@ def _config_echo(config):
         "min_opacity": config["min_opacity"],
         "pointcloud_pattern": config["pointcloud_pattern"],
         "extraction": dict(config["extraction"]),
+        "mesh": dict(config.get("mesh", {"method": "poisson"})),
         "animation": dict(config["animation"]),
         "paths": dict(config["paths"]),
     }
