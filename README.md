@@ -30,7 +30,7 @@ There are two ways into this repository. Most users only need the first one.
 | I want to... | Start with |
 | --- | --- |
 | Rig my own registered point sequence | [Quick start](#quick-start) |
-| Animate Gaussians or point clouds | [Import, extract, and interact](skelebone/README.md) |
+| Rig and animate Gaussians | [Gaussian animation](#gaussian-animation) |
 | Understand the representation | [What is a skelebone?](#what-is-a-skelebone) |
 | Call the library from Python | [Python API](#python-api) |
 | Transfer a new motion | [Animate with PartMM](#animate-with-partmm) |
@@ -223,10 +223,14 @@ consistent. Scale still matters, however: extraction includes absolute distance
 controls such as `--joint-merge-distance 0.08`. Normalize unusually large or
 small assets, or tune the distance parameters for their scale.
 
+<a id="gaussian-animation"></a>
+
 For Gaussian inputs, `points` is typically the time series of Gaussian means.
 Optional per-point colors, opacity, scales, rotations, SH coefficients, and
 source IDs are retained in `point_attributes`; extraction operates on means.
 See the [Gaussian and point-cloud guide](skelebone/README.md).
+
+![Interactive Gaussian animation](assets/gaussian-animation.jpg)
 
 ## Output Contract
 
