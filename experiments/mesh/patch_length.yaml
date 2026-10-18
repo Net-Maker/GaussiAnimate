@@ -24,9 +24,9 @@ methods:
       - id: evaluate
         type: command
         resources: {gpu: true}
-        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - ${GA_VTO_PYTHON:-python}
           - -m
           - experiments.mesh.patch_length
           - --patch-size
@@ -38,21 +38,17 @@ methods:
           - --expected-cases
           - tshirt_shape00_91_33,tshirt_shape00_91_36,tshirt_shape00_91_38,tshirt_shape00_91_61,tshirt_shape00_91_62
           - --run-if-missing
-          - --runner-code-root
-          - ${GA_VTO_PARTMM_CODE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/code}
           - --vto-root
-          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}
+          - ${GA_VTO_ROOT:-datasets/vto-dataset}
           - --smpl-model-path
-          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
-          - --smpl-fk-model-dir
-          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
-          - --ssdr-cache
-          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
+          - --fit-dir
+          - "{output_root}/source_fit"
           - --device
           - cuda
         inputs:
-          - ${GA_VTO_SSDR_CACHE:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/ssdr_cache_scalability/tshirt_n5_bones20.npy}
-          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}/tshirt/simulations
+          - ${GA_VTO_ROOT:-datasets/vto-dataset}/tshirt/simulations
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
         outputs:
           - "{run_dir}/raw/per_case_summary.json"
           - "{run_dir}/geometry_metrics.json"

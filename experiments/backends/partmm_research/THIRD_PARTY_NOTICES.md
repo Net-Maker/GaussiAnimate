@@ -2,8 +2,8 @@
 
 This package vendors a bounded, minimal closure of research source code so
 the PartMM experiment stages run as normal packaged imports without an
-external implementation checkout on `sys.path`. Computations are unchanged;
-only imports, module paths, and packaging metadata were edited.
+external implementation checkout on `sys.path`. Local changes include
+packaged imports and bug fixes; the original source attribution is retained.
 
 ## Author-owned research code (author's `smpl_to_ssdr` snapshot)
 

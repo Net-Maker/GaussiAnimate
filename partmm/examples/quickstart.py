@@ -15,6 +15,8 @@ from partmm import (
     PartMMOutput,
     PartMMQuery,
     animate,
+    load_input,
+    load_query,
     save_input,
     save_output,
     save_query,
@@ -194,8 +196,8 @@ def load_hood_tshirt_case(
 
 def run(
     output_directory,
-    hood_root,
-    vto_root,
+    hood_root=None,
+    vto_root=None,
     query_case=DEFAULT_QUERY_CASE,
     database_cases=DEFAULT_DATABASE_CASES,
     config=PartMMConfig(partition_mode="humanoid_five"),
@@ -203,23 +205,21 @@ def run(
     preview_format="gif",
     max_preview_frames=40,
     preview_fps=12.0,
+    bundle=None,
 ):
     output_directory = Path(output_directory)
     output_directory.mkdir(parents=True, exist_ok=True)
-    (
-        database,
-        query,
-        target_points,
-        target_joints,
-        faces,
-        historical_partmm_rmse,
-    ) = load_hood_tshirt_case(
-        hood_root,
-        vto_root,
-        query_case=query_case,
-        database_cases=tuple(database_cases),
-        fps=fps,
-    )
+    if bundle is not None or (hood_root is None and vto_root is None):
+        bundle = Path(bundle or "resources/partmm/example").expanduser()
+        database, query, target_points, target_joints, faces, query_case = load_example_bundle(bundle)
+        historical_partmm_rmse = None
+    else:
+        if hood_root is None or vto_root is None:
+            raise ValueError("Legacy mode requires both hood_root and vto_root")
+        (database, query, target_points, target_joints, faces,
+         historical_partmm_rmse) = load_hood_tshirt_case(
+            hood_root, vto_root, query_case=query_case,
+            database_cases=tuple(database_cases), fps=fps)
     retrieved = animate(database, query, config)
     result = PartMMOutput(
         points=retrieved.points,
@@ -249,15 +249,18 @@ def run(
             database.parents,
             frames=[0, query.num_frames // 2, query.num_frames - 1],
         )
+    elif preview_format == "none":
+        preview_path = None
     else:
-        raise ValueError("preview_format must be 'gif' or 'png'")
+        raise ValueError("preview_format must be 'gif', 'png', or 'none'")
 
     paths = {
         "input": save_input(output_directory / "partmm_input.npz", database),
         "query": save_query(output_directory / "partmm_query.npz", query),
         "output": save_output(output_directory / "partmm_output.npz", result),
-        "preview": preview_path,
     }
+    if preview_path is not None:
+        paths["preview"] = preview_path
     metrics = {
         "case": query_case,
         "database_cases": list(database_cases),
@@ -268,15 +271,66 @@ def run(
         "outer_bones": database.num_bones,
         "recomputed_rmse_native_units": rmse,
         "recomputed_rmse_mm": rmse * 1000.0,
+        "mean_vertex_error_mm": float(np.linalg.norm(result.points - target_points, axis=-1).mean() * 1000.0),
         "historical_partmm_rmse_mm": historical_partmm_rmse,
         "config": asdict(config),
-        "hood_root": str(Path(hood_root).expanduser()),
-        "vto_root": str(Path(vto_root).expanduser()),
     }
+    if bundle is not None:
+        metrics["bundle"] = str(bundle)
+        metadata_path = bundle / "preparation.json"
+        if metadata_path.is_file():
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            metrics["database_cases"] = metadata.get("source_cases", [])
+            metrics["preparation"] = metadata
+        else:
+            metrics["database_cases"] = None
+    else:
+        metrics.update(hood_root=str(Path(hood_root).expanduser()),
+                       vto_root=str(Path(vto_root).expanduser()))
     metrics_path = output_directory / "metrics.json"
     metrics_path.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
     paths["metrics"] = metrics_path
     return paths
+
+
+def load_example_bundle(directory):
+    """Load pickle-free animation inputs with matching topology and reference."""
+    directory = Path(directory)
+    required = ("partmm_input.npz", "partmm_query.npz", "partmm_reference.npz")
+    missing = [name for name in required if not (directory / name).is_file()]
+    if missing:
+        raise FileNotFoundError(
+            f"Missing PartMM example files in {directory}: {', '.join(missing)}. "
+            "Prepare them with: python -m experiments.mesh.prepare_partmm "
+            f"{directory} --vto-root /path/to/vto-dataset "
+            "--smpl-model-path /path/to/SMPL_FEMALE.pkl"
+        )
+    database = load_input(directory / required[0])
+    query = load_query(directory / required[1])
+    with np.load(directory / required[2], allow_pickle=False) as arrays:
+        fields = {"gt_vertices", "skeleton_joints", "faces", "case", "fps"}
+        if not fields.issubset(arrays.files):
+            raise ValueError("PartMM reference requires " + ", ".join(sorted(fields)))
+        points = np.asarray(arrays["gt_vertices"], dtype=np.float64)
+        joints = np.asarray(arrays["skeleton_joints"], dtype=np.float64)
+        faces = np.asarray(arrays["faces"])
+        case = str(arrays["case"].item())
+        reference_fps = float(arrays["fps"])
+    if points.shape != (query.num_frames, len(database.source_points), 3):
+        raise ValueError("Reference gt_vertices must match the query frames and source points")
+    if joints.shape != (query.num_frames, database.skeleton.num_joints, 3):
+        raise ValueError("Reference skeleton_joints must match the query frames and skeleton")
+    if query.local_rotations.shape[1] != database.skeleton.num_joints:
+        raise ValueError("Query and database skeleton sizes differ")
+    if not np.isfinite(points).all() or not np.isfinite(joints).all():
+        raise ValueError("Reference vertices and joints must be finite")
+    if (faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0
+            or not np.isfinite(faces).all() or not np.equal(faces, np.round(faces)).all()
+            or faces.min() < 0 or faces.max() >= len(database.source_points)):
+        raise ValueError("Reference faces must contain valid source vertex indices")
+    if not np.isclose(reference_fps, query.fps):
+        raise ValueError("Reference and query frame rates differ")
+    return database, query, points, joints, faces.astype(np.int64), case
 
 
 def main():
@@ -287,13 +341,14 @@ def main():
         )
     )
     parser.add_argument("output", nargs="?", default="partmm_tshirt_demo")
+    parser.add_argument("--bundle", help="Prepared input/query/reference directory")
     parser.add_argument(
         "--hood-root",
-        default=os.environ.get("GA_HOOD_ROOT", "~/research/GA/hood"),
+        default=None,
     )
     parser.add_argument(
         "--vto-root",
-        default=os.environ.get("GA_VTO_ROOT", "~/research/data/vto-dataset"),
+        default=None,
     )
     parser.add_argument("--case", default=DEFAULT_QUERY_CASE)
     parser.add_argument(
@@ -312,7 +367,7 @@ def main():
         default="humanoid_five",
     )
     parser.add_argument(
-        "--preview-format", choices=("gif", "png"), default="gif"
+        "--preview-format", choices=("gif", "png", "none"), default="gif"
     )
     parser.add_argument("--max-preview-frames", type=int, default=40)
     parser.add_argument("--preview-fps", type=float, default=12.0)
@@ -328,8 +383,8 @@ def main():
     )
     paths = run(
         args.output,
-        args.hood_root,
-        args.vto_root,
+        args.hood_root or (os.environ.get("GA_HOOD_ROOT") if args.vto_root else None),
+        args.vto_root or (os.environ.get("GA_VTO_ROOT") if args.hood_root else None),
         query_case=args.case,
         database_cases=args.database_cases,
         config=config,
@@ -337,6 +392,7 @@ def main():
         preview_format=args.preview_format,
         max_preview_frames=args.max_preview_frames,
         preview_fps=args.preview_fps,
+        bundle=args.bundle,
     )
     for name, path in paths.items():
         print(f"{name}: {path}")

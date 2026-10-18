@@ -9,7 +9,7 @@ The directory is deliberately self-contained. Copy `partmm/` into another
 project and the animation runtime will work with NumPy alone; it never imports
 GaussiAnimate or `skelebone`.
 
-![HOOD T-shirt PartMM animation](examples/partmm_hood.gif)
+![VTO T-shirt PartMM animation](examples/partmm_hood.gif)
 
 ```text
 source skeleton motion + outer-bone motion   novel skeleton motion
@@ -19,22 +19,15 @@ source skeleton motion + outer-bone motion   novel skeleton motion
                        animated points + transforms
 ```
 
-## Run the HOOD T-shirt example
+## Run the VTO T-shirt example
 
-The included example is the real `tshirt_shape00_91_33` evaluation case from
-the HOOD/VTO workspace. Its inner control rig is the standard 24-joint SMPL
-hierarchy; its outer deformation rig is the 20-bone SSDR decomposition fitted
-to the T-shirt. It uses the same five T-shirt database sequences declared by
-the paper experiment config:
+The `tshirt_shape00_91_33` example uses an inner SMPL control rig and an outer
+SSDR deformation rig fitted to the official VTO T-shirt simulations.
 
-```text
-tshirt_shape00_01_01   tshirt_shape00_02_04   tshirt_shape00_02_05
-tshirt_shape00_05_20   tshirt_shape00_07_02
-```
+Follow [data preparation](../resources/partmm/README.md) to build the example
+locally from the official VTO simulations and SMPL model.
 
-The small [resource bundle](../resources/partmm/README.md) contains ready-to-use
-NumPy inputs for this case. After downloading the bundle (sharing link pending),
-run the standalone animation without a HOOD checkout or SMPL model files:
+Animate the prepared inputs:
 
 ```bash
 python -m partmm resources/partmm/example/partmm_input.npz \
@@ -42,28 +35,16 @@ python -m partmm resources/partmm/example/partmm_input.npz \
   --partition-mode humanoid_five
 ```
 
-To rebuild the visualized example from the original simulation exports,
-point the example to licensed local copies of HOOD's saved SSDR results and the
-VTO simulations. These datasets are intentionally not copied into this folder.
-Download the simulations from the [VTO dataset](https://github.com/isantesteban/vto-dataset);
-the [HOOD repository](https://github.com/Dolorousrtur/HOOD) provides the upstream
-cloth-model code. The quickstart's saved SSDR and reference NPZ caches are not
-part of that upstream data: they are author-generated, not yet published for
-download, and cloning HOOD alone does not supply them. See the
-[resource inventory](../experiments/README.md#resources) for acquisition details
-and the remaining release dependencies.
+Render and evaluate the same bundle:
 
 ```bash
 python -m pip install "numpy<1.26" "open3d>=0.19,<0.20" Pillow
 
-export GA_HOOD_ROOT=/path/to/hood
-export GA_VTO_ROOT=/path/to/vto-dataset
-python -m partmm.examples.quickstart outputs/partmm_tshirt_demo
+python -m partmm.examples.quickstart outputs/partmm_tshirt_demo \
+  --bundle resources/partmm/example
 ```
 
-The defaults match the current five-part PartMM configuration. On the research
-workspace, the command consumes 840 source frames and evaluates all 203 frames
-and 4424 vertices of `tshirt_shape00_91_33`.
+Use `--preview-format none` for headless evaluation.
 
 It creates five inspectable artifacts:
 
@@ -76,17 +57,11 @@ outputs/partmm_tshirt_demo/
 └── metrics.json        case, config, dimensions, and RMSE against cloth GT
 ```
 
-`metrics.json` keeps the newly recomputed RMSE separate from the historical
-PartMM value stored by HOOD. The former is evidence from this public
-implementation; the latter is reference metadata, not silently relabeled as a
-new run.
+`metrics.json` reports coordinate RMSE and mean Euclidean vertex error against
+the prepared garment ground truth.
 
-[`examples/quickstart.py`](examples/quickstart.py) contains no imports from
-HOOD, SMPL-X, GaussiAnimate, or `skelebone`: it adapts the trusted resource
-files using only NumPy and the Python standard library. Start there when
-integrating an existing motion database into another codebase. Because the
-historical SSDR cache contains a pickled dictionary, use this adapter only with
-a trusted HOOD workspace.
+[`examples/quickstart.py`](examples/quickstart.py) shows the complete animate,
+render, and evaluate flow over the prepared files.
 
 ## Use a skelebone result
 
@@ -245,13 +220,11 @@ python -m experiments.multiview_gaussian.partmm_repair \
 ```
 
 Alignment is evaluated per frame inside each retrieved patch. Transform
-blending preserves each bone's weighted influence center. For historical
-diagnostics, `alignment_frames="patch_center"` and `blend_space="origin"`
-retain the previous conventions.
+blending preserves each bone's weighted influence center.
 
 ## Visualize a result
 
-The Open3D GIF renderer is optional and remains outside the NumPy-only runtime:
+The Open3D GIF renderer is optional and separate from the core runtime:
 
 ```bash
 python -m pip install "open3d>=0.19,<0.20" Pillow
@@ -297,7 +270,6 @@ python -m partmm skelebones.npz novel_pose.npz --validate-only
 
 ## What to copy
 
-Copy the complete `partmm/` directory, including `examples/`. The core runtime
-depends only on Python's standard library and NumPy. Open3D and Pillow are used
-only for the animated preview, Matplotlib only for the static preview, and Dear
-PyGui only for `partmm.gui`.
+Copy the complete `partmm/` directory, including `examples/`, alongside your
+prepared input and query files. Optional preview dependencies are Open3D and
+Pillow for GIF, Matplotlib for PNG, and Dear PyGui for `partmm.gui`.

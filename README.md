@@ -289,7 +289,7 @@ extraction, joint detection, and tracking are available under
 `partmm/` is a standalone NumPy package: it can be copied directly into another
 project without `skelebone` or the experiment code. See the
 [standalone guide](partmm/README.md) for the direct-array contract and the real
-HOOD/VTO T-shirt example.
+VTO T-shirt example.
 
 A novel pose is another portable NPZ:
 
@@ -316,20 +316,18 @@ gaussianimate-animate \
 - retrieved source-frame indices for each skeleton part
 - scalar `fps`
 
-Run the example and generate a shared-scale temporal preview:
+Prepare the T-shirt from the [official data and SMPL model](resources/partmm/README.md),
+then generate a shared-scale temporal preview:
 
 ```bash
 python -m pip install -e '.[visualization]'
-export GA_HOOD_ROOT=/path/to/hood
-export GA_VTO_ROOT=/path/to/vto-dataset
-python -m partmm.examples.quickstart outputs/partmm_tshirt_demo
+python -m partmm.examples.quickstart outputs/partmm_tshirt_demo \
+  --bundle resources/partmm/example
 ```
 
-![HOOD T-shirt PartMM animation](partmm/examples/partmm_hood.gif)
+![VTO T-shirt PartMM animation](partmm/examples/partmm_hood.gif)
 
-This example keeps the two representations explicit: the query motion is the
-24-joint SMPL hierarchy, while the cloth deformation is driven by 20 SSDR outer
-bones. The final panel is the PartMM-retrieved T-shirt motion.
+The preview shows the SMPL query skeleton, SSDR outer bones, and animated T-shirt.
 
 For the optional pose editor:
 

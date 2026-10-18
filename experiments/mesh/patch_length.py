@@ -2,9 +2,7 @@
 
 import argparse
 import hashlib
-import importlib
 import json
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -29,56 +27,25 @@ def run_patch_length(
     patch_size,
     output_dir,
     *,
-    code_root,
+    code_root=None,
     vto_root,
     smpl_model_path,
-    smpl_fk_model_dir,
-    ssdr_cache,
+    smpl_fk_model_dir=None,
+    ssdr_cache=None,
     expected_cases,
     device="cuda",
     n_train=5,
 ):
-    """Execute the frozen five-case runner with one explicit patch size."""
+    """Run the bundled research matcher; generate its source fit locally."""
+    from .vto_partmm import run_ablation
 
-    code_root = Path(code_root).resolve()
-    sys.path.insert(0, str(code_root))
-    runner = importlib.import_module("run_partmm_tshirt_ablation")
-    config = runner.PARTMM_VARIANTS["default"]
-    original = config.patch_size
-    argv = sys.argv
-    try:
-        config.patch_size = int(patch_size)
-        sys.argv = [
-            "run_partmm_tshirt_ablation.py",
-            "--target-seqs",
-            ",".join(expected_cases),
-            "--garment",
-            "tshirt",
-            "--n-train",
-            str(int(n_train)),
-            "--exclude",
-            "tshirt_shape00_104_17",
-            "--vto-data-root",
-            str(vto_root),
-            "--smpl-model-path",
-            str(smpl_model_path),
-            "--smpl-fk-model-dir",
-            str(smpl_fk_model_dir),
-            "--ssdr-cache",
-            str(ssdr_cache),
-            "--variants",
-            "default",
-            "--output-dir",
-            str(output_dir),
-            "--device",
-            str(device),
-            "--no-save-vertices",
-        ]
-        runner.main()
-    finally:
-        config.patch_size = original
-        sys.argv = argv
-        sys.path.remove(str(code_root))
+    if ssdr_cache and Path(ssdr_cache).suffix in {".npy", ".npz"}:
+        raise ValueError("Use --fit-dir for a locally generated source-fit directory, not a legacy SSDR cache")
+    return run_ablation(
+        output_dir, patch_size=patch_size, vto_root=vto_root,
+        smpl_model_path=smpl_model_path, expected_cases=expected_cases,
+        n_train=n_train, device=device, fit_dir=ssdr_cache,
+    )
 
 
 def evaluate_patch_length(
@@ -160,7 +127,7 @@ def main():
     parser.add_argument("--vto-root")
     parser.add_argument("--smpl-model-path")
     parser.add_argument("--smpl-fk-model-dir")
-    parser.add_argument("--ssdr-cache")
+    parser.add_argument("--fit-dir", "--ssdr-cache", dest="ssdr_cache")
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
     source = Path(args.source)
@@ -169,11 +136,8 @@ def main():
         if not args.run_if_missing:
             raise FileNotFoundError(source)
         required = {
-            "runner_code_root": args.runner_code_root,
             "vto_root": args.vto_root,
             "smpl_model_path": args.smpl_model_path,
-            "smpl_fk_model_dir": args.smpl_fk_model_dir,
-            "ssdr_cache": args.ssdr_cache,
         }
         missing = sorted(key for key, value in required.items() if not value)
         if missing:

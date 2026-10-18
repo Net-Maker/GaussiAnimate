@@ -37,6 +37,16 @@ def evaluate_dt4d_method(
     experiment_root = Path(experiment_root)
     summary = Path(summary)
     if not summary.is_file():
+        missing = [name for name in ("run_all.py", "benchmark_all.py")
+                   if not (experiment_root / name).is_file()]
+        if missing:
+            raise FileNotFoundError(
+                "D4D historical benchmark regeneration is not included in this release. "
+                "Supply an existing benchmark summary or the original experiment runner "
+                f"({', '.join(missing)} missing under {experiment_root}). "
+                "For raw official .anime data, use python -m experiments.mesh.d4d_prepare; "
+                "that conversion alone does not reproduce Table 4."
+            )
         subprocess.run(
             [
                 str(python),

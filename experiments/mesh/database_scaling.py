@@ -92,12 +92,12 @@ def profile_database_sizes(
     output,
     *,
     sizes,
-    runner_code_root,
+    runner_code_root=None,
     raw_root,
     vto_root,
     smpl_model_path,
-    smpl_fk_model_dir,
-    ssdr_cache_template,
+    smpl_fk_model_dir=None,
+    ssdr_cache_template=None,
     expected_cases,
     device="cuda",
 ):
@@ -129,7 +129,8 @@ def profile_database_sizes(
             vto_root=vto_root,
             smpl_model_path=smpl_model_path,
             smpl_fk_model_dir=smpl_fk_model_dir,
-            ssdr_cache=str(ssdr_cache_template).format(sequences=size),
+            ssdr_cache=(str(ssdr_cache_template).format(sequences=size)
+                        if ssdr_cache_template else str(Path(raw_root) / f"fit_n{size}")),
             expected_cases=expected_cases,
             device=device,
             n_train=size,
@@ -157,6 +158,7 @@ def profile_database_sizes(
                 "gpu_mb": float(peak_allocated),
                 "gpu_reserved_mb": float(peak_reserved),
                 "per_case_source": _source(per_case),
+                "rmse_mm": float(np.mean([float(row["rmse_mm"]) for row in rows])),
             }
         )
     result = {
@@ -180,6 +182,13 @@ def profile_database_sizes(
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    accuracy = {
+        "train_sizes": sizes,
+        "mm_rmse": [row["rmse_mm"] for row in measurements],
+        "evaluation_cases": list(expected_cases),
+        "source": str(output.resolve()),
+    }
+    (output.parent / "accuracy.json").write_text(json.dumps(accuracy, indent=2) + "\n")
     return result
 
 
@@ -197,7 +206,7 @@ def evaluate_database_scaling(
     *,
     expected_sizes=(5, 20, 50),
 ):
-    """Cross-check independent accuracy and profiler outputs for Table R.1."""
+    """Validate accuracy and profiler outputs for Table R.1."""
 
     expected_sizes = [int(value) for value in expected_sizes]
     sequences = int(sequences)
@@ -276,12 +285,9 @@ def main():
     args = parser.parse_args()
     if args.profile:
         required = [
-            "runner_code_root",
             "raw_root",
             "vto_root",
             "smpl_model_path",
-            "smpl_fk_model_dir",
-            "ssdr_cache_template",
             "expected_cases",
         ]
         missing = [name for name in required if not getattr(args, name)]

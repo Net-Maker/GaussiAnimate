@@ -26,6 +26,12 @@ visualization = [
   "matplotlib>=3.7",
 ]
 ssdr = ["scipy>=1.8,<1.16"]
+vto = [
+  "torch>=2.0,<2.6",
+  "smplx>=0.1.28,<0.2",
+  "chumpy==0.70",
+  "scipy>=1.8,<1.16",
+]
 geometry = [
   "open3d>=0.19,<0.20",
   "matplotlib>=3.7",

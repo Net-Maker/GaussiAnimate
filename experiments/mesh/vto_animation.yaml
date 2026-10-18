@@ -17,12 +17,10 @@ datasets:
         exclude: tshirt_shape00_104_17
         training_cases: tshirt_shape00_01_01,tshirt_shape00_02_04,tshirt_shape00_02_05,tshirt_shape00_05_20,tshirt_shape00_07_02
         expected_cases: tshirt_shape00_91_33,tshirt_shape00_91_36,tshirt_shape00_91_38,tshirt_shape00_91_61,tshirt_shape00_91_62
-        summary: ${GA_VTO_TSHIRT_SUMMARY:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/precomputed_tshirt/summary.json}
       - id: dress
         exclude: ""
         training_cases: dress_shape00_01_01,dress_shape00_02_04,dress_shape00_02_05,dress_shape00_05_20,dress_shape00_07_02
         expected_cases: dress_shape00_91_38,dress_shape00_91_61,dress_shape00_91_62
-        summary: ${GA_VTO_DRESS_SUMMARY:-~/research/GA/hood/output/precomputed_dress/summary.json}
 methods:
   - id: robust_lbs
     label: Robust LBS
@@ -30,9 +28,9 @@ methods:
     stages:
       - id: evaluate
         type: command
-        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - ${GA_VTO_PYTHON:-python}
           - -m
           - experiments.mesh.vto_lbs
           - --garment
@@ -40,9 +38,9 @@ methods:
           - --output
           - "{run_dir}/geometry_metrics.json"
           - --vto-root
-          - ${GA_VTO_ROOT:-~/research/data/vto-dataset}
+          - ${GA_VTO_ROOT:-datasets/vto-dataset}
           - --smpl-model-path
-          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
           - --test-start
           - 50
           - --exclude
@@ -52,8 +50,8 @@ methods:
           - --result-dir
           - "{run_dir}/lbs_arrays"
         inputs:
-          - "${GA_VTO_ROOT:-~/research/data/vto-dataset}/{case.id}/simulations"
-          - ${GA_SMPL_MODEL_DIR:-~/research/lib/SMPL_python_v.1.1.0/smpl/models}
+          - "${GA_VTO_ROOT:-datasets/vto-dataset}/{case.id}/simulations"
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
         outputs:
           - "{run_dir}/geometry_metrics.json"
           - "{run_dir}/lbs_arrays/transferred_weights.npz"
@@ -65,9 +63,9 @@ methods:
         id: evaluate
         type: command
         resources: {gpu: true}
-        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - ${GA_VTO_PYTHON:-python}
           - -m
           - experiments.mesh.vto_suite
           - --garment
@@ -77,19 +75,22 @@ methods:
           - --output
           - "{run_dir}/geometry_metrics.json"
           - --summary
-          - "{case.summary}"
+          - "{output_root}/raw/{case.id}/summary.json"
           - --expected-cases
           - "{case.expected_cases}"
-          - --hood-root
-          - ${GA_HOOD_ROOT:-~/research/GA/hood}
-          - --python
-          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - --vto-root
+          - ${GA_VTO_ROOT:-datasets/vto-dataset}
+          - --smpl-model-path
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
+          - --seed
+          - "{experiment.seed}"
           - --n-train
           - 5
           - --exclude
           - "{case.exclude}"
         inputs:
-          - "${GA_VTO_ROOT:-~/research/data/vto-dataset}/{case.id}/simulations"
+          - "${GA_VTO_ROOT:-datasets/vto-dataset}/{case.id}/simulations"
+          - ${GA_SMPL_MODEL_DIR:-datasets/smpl}
         outputs: ["{run_dir}/geometry_metrics.json"]
   - id: gru
     label: Ours + GRU (hidden 512)

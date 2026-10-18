@@ -21,15 +21,15 @@ methods:
     stages:
       - id: evaluate
         type: command
-        cwd: ${GAUSSIANIMATE_ROOT:-~/research/code/GaussiAnimate}
+        cwd: "{config_dir}/../.."
         command:
-          - ${GA_HOOD_PYTHON:-~/anaconda3/envs/hood/bin/python}
+          - ${GA_VTO_PYTHON:-python}
           - -m
           - experiments.mesh.database_scaling
           - --sequences
           - "{case.sequences}"
           - --accuracy-source
-          - ${GA_VTO_SCALING_ACCURACY:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/scalability_results/v2/tshirt_clean_results.json}
+          - "{output_root}/raw/accuracy.json"
           - --profile-source
           - "{output_root}/raw/table_r1_profile.json"
           - --output
@@ -37,6 +37,6 @@ methods:
           - --expected-sizes
           - 5,20,50
         inputs:
-          - ${GA_VTO_SCALING_ACCURACY:-~/research/GA/hood/rebuttal_partmm_tshirt_shape00_91_33/data/scalability_results/v2/tshirt_clean_results.json}
+          - "{output_root}/raw/accuracy.json"
           - "{output_root}/raw/table_r1_profile.json"
         outputs: ["{run_dir}/scaling_metrics.json"]

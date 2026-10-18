@@ -41,11 +41,8 @@ and are not listed here.
 | D-NeRF dataset | [Official instructions](https://github.com/albertpumarola/D-NeRF#download-dataset) / [Data archive](https://www.dropbox.com/scl/fi/cdcmkufncwcikk1dzbgb4/data.zip?rlkey=n5m21i84v2b2xk6h7qgiu8nkg&dl=0) |
 | DG-Mesh dataset | [Official instructions](https://github.com/Isabella98Liu/DG-Mesh#training-on-the-dg-mesh-dataset) / [Data archive](https://drive.google.com/file/d/1yBga2DsIKG6zQK9V2WextewvhaV8Xho3/view) |
 
-**Author-generated resources:** the PartMM example, SSDR databases, and
-reference caches are organized under
-[`resources/partmm/`](../resources/partmm/README.md) for a separate download.
-No public download URL is available yet; official HOOD/VTO downloads
-do not contain these fitted caches.
+**PartMM example:** [prepare the T-shirt example](../resources/partmm/README.md)
+from the official sources listed there.
 
 Trained Gaussian/BoB checkpoints and processed poses/evaluation data are not
 being released at this time. The commands below operate on local inputs or
@@ -56,11 +53,9 @@ Before redistributing the copied research backends, review their
 [licensing notices](../THIRD_PARTY_NOTICES.md); copying a dependency into this
 repository does not change its license.
 
-**Remaining code dependency:** the VTO Table 4/5/R.1 runners still use
-author-specific HOOD experiment scripts that have not yet been migrated.
-Cloning official HOOD does not supply those scripts. The D4D benchmark's
-full regeneration entry point also remains to be migrated; its independent
-raw-data converter is already included below.
+The D4D benchmark's full regeneration entry point remains to be migrated;
+its independent raw-data converter is included below. ActorsHQ body-pose
+fits must be supplied locally; the capture converter does not generate them.
 
 ## Table 2: Synthetic Novel-View Rendering
 
@@ -124,13 +119,12 @@ under [multiview_gaussian/methods/](multiview_gaussian/methods/):
 research code and [SMPL](#resources)/[SMPL-X](#resources) model files.
 The research PartMM adapter is included under
 `experiments/backends/partmm_research/`; it is separate from the standalone
-NumPy-only `partmm/` runtime.
+`partmm/` runtime.
 
 **Capture selection:** DNA uses `0012_11`, `0013_01`, `0013_03`, `0013_09`,
 `0013_11`, `0019_08`, `0021_03`, and `0023_06`, with 150 prepared frames per
 capture: frames 0-119 for motion fitting and 120-149 for novel-pose evaluation.
-The conversion scripts use raw frames 0-149; the older checkpoints do not
-record an independently verifiable raw-to-prepared mapping.
+The conversion scripts use raw frames 0-149.
 
 ActorsHQ uses these inclusive raw frame ranges, downsampled by 4 in image
 resolution. Each capture has 240 motion-fitting frames followed by 60 test
@@ -168,25 +162,26 @@ and [novel_pose.yaml](multiview_gaussian/novel_pose.yaml).
 dataset means in `averages.csv`. Evaluation renders are used to compute
 metrics but are not saved as images by this runner.
 
-For completed repaired runs, print the TrainSet/TestSet PSNR comparison below.
-This requires prior
-TrainSet/TestSet metric caches for all three methods and
-`runs/partmm_repaired_evaluation/*.json` under the release root, and is not
-part of the fresh run chain.
+To summarize existing TrainSet/TestSet results, supply metric caches for all
+three methods and `runs/partmm_repaired_evaluation/*.json` under the release
+root. This command is separate from the fresh-run pipeline:
 
 ```bash
 python -m experiments.multiview_gaussian.table3_psnr \
   --root "$GA_MULTIVIEW_RELEASE_ROOT" --method all --summary-only
 ```
 
-Some D3DGS reconstructions contain distant Gaussian-center artifacts.
-
 ## Table 4: Garment and Animal Animation
 
-**VTO** needs the [HOOD](#resources)/VTO runtime, [SMPL](#resources) model
-files, and the [VTO](#resources) dataset:
+**VTO:** obtain the official [VTO](#resources) simulations and female
+[SMPL](#resources) model. SSDR, MLP/GRU training, and motion matching run
+locally.
 
 ```bash
+python -m pip install -e '.[vto,research,geometry]'
+bash scripts/install_geometry.sh --pyssdr-only --python "$(command -v python)"
+export GA_VTO_ROOT=/path/to/vto-dataset
+export GA_SMPL_MODEL_DIR=/path/to/smpl/models
 gaussianimate-paper experiments/mesh/vto_animation.yaml --gpus 0
 ```
 
@@ -216,46 +211,38 @@ under `experiments/runs/`.
 
 ## Table 5: Temporal Patch-Length Ablation
 
-Needs the external VTO PartMM runner and a 5-sequence SSDR cache. Set
-`GA_VTO_PARTMM_CODE` (runner code), `GA_VTO_ROOT` ([VTO](#resources)
-dataset), `GA_SMPL_MODEL_DIR` ([SMPL](#resources) models), and
-`GA_VTO_SSDR_CACHE` (SSDR cache);
-[patch_length.yaml](mesh/patch_length.yaml) documents the defaults:
+Uses the bundled research PartMM runner. Obtain [VTO](#resources) and
+[SMPL](#resources), then run:
 
 ```bash
+python -m pip install -e '.[vto,research]'
+bash scripts/install_geometry.sh --pyssdr-only --python "$(command -v python)"
+export GA_VTO_ROOT=/path/to/vto-dataset
+export GA_SMPL_MODEL_DIR=/path/to/smpl/models
 gaussianimate-paper experiments/mesh/patch_length.yaml --gpus 0
 ```
 
+The source-only SSDR fit is generated locally and shared across patch sizes.
 Outputs land in `experiments/runs/partmm_patch_length/` (per-case
 `raw/per_case_summary.json` and `geometry_metrics.json` plus the standard
 aggregates described at the end).
 
 ## Table R.1: Database Size, Accuracy, and Runtime
 
-Profile first, then aggregate. Profiling runs in the
-[HOOD](#resources)/[VTO](#resources) Python environment: set
-`GA_HOOD_PYTHON` to its interpreter (the mesh configs
-default to `~/anaconda3/envs/hood/bin/python`). The SSDR cache template must
-contain `{sequences}`, with caches present for sizes 5, 20, and 50. The
-profile JSON is written to `--profile-source`, which is also the file the
-aggregation stage reads:
+Use the same environment and official data as Table 5. Profile first, then
+aggregate. Missing source-only SSDR fits are generated for each database size:
 
 ```bash
-"$GA_HOOD_PYTHON" -m experiments.mesh.database_scaling --profile \
+python -m experiments.mesh.database_scaling --profile \
   --profile-source experiments/runs/partmm_database_scaling/raw/table_r1_profile.json \
   --raw-root experiments/runs/partmm_database_scaling/raw \
-  --runner-code-root /path/to/partmm/runner/code \
-  --vto-root /path/to/vto-dataset \
-  --smpl-model-path /path/to/SMPL/models \
-  --smpl-fk-model-dir /path/to/SMPL/models \
-  --ssdr-cache-template /path/to/ssdr_cache/tshirt_n{sequences}_bones20.npy \
+  --vto-root "$GA_VTO_ROOT" \
+  --smpl-model-path "$GA_SMPL_MODEL_DIR" \
   --expected-cases tshirt_shape00_91_33,tshirt_shape00_91_36,tshirt_shape00_91_38,tshirt_shape00_91_61,tshirt_shape00_91_62 \
   --expected-sizes 5,20,50 --device cuda
 ```
 
-Aggregation cross-checks the profile against an independent VTO accuracy
-file (`GA_VTO_SCALING_ACCURACY`); see
-[database_scaling.yaml](mesh/database_scaling.yaml) for the default path.
+Profiling also writes `raw/accuracy.json` from the same held-out predictions.
 
 ```bash
 gaussianimate-paper experiments/mesh/database_scaling.yaml --gpus 0

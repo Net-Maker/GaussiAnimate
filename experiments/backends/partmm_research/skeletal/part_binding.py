@@ -368,7 +368,7 @@ class PartBasedSkeletalBinding:
             else:
                 # Fallback to max weight vertex if weights sum to ~0
                 max_weight_idx = torch.argmax(bone_weights)
-            ssdr_bone_positions[bone_idx] = rest_vertices[max_weight_idx]
+                ssdr_bone_positions[bone_idx] = rest_vertices[max_weight_idx]
 
         # =====================================================================
         # Compute distance to LIMB SEGMENTS (not joints!)

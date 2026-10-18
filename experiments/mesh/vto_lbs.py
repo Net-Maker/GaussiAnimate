@@ -85,16 +85,16 @@ def _deform_cloth_with_lbs(rest_vertices, weights, transforms):
 
 def _pelvis_offset(model_path):
     import torch
-    from smplx import SMPL
+    from experiments.mesh.smpl import load_smpl_model
 
-    model = SMPL(str(model_path), gender="female", batch_size=1)
+    model = load_smpl_model(model_path, gender="female", batch_size=1)
     with torch.no_grad():
         output = model(
             body_pose=torch.zeros(1, 69),
             global_orient=torch.zeros(1, 3),
             transl=torch.zeros(1, 3),
         )
-    return output.joints[0, 0].detach().cpu().numpy(), SMPL
+    return output.joints[0, 0].detach().cpu().numpy(), load_smpl_model
 
 
 def select_vto_paths(paths, *, test_start, exclude, expected_cases=None):
